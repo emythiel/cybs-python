@@ -17,5 +17,5 @@ print("\nLength (letters): " + str(len(full_name) - 1))
 
 print("\nPrint 50 times:\n" + ((full_name + " ") * 50))
 
-print("\nLast letter: " + last_name[-1])
+print("\nLast letter: " + full_name[-1])
 print("\nIs there z: " + str('z' in full_name))
