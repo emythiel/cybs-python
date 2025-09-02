@@ -10,6 +10,7 @@
 first_name = 'John'
 last_name = 'Doe'
 full_name = first_name + ' ' + last_name
+
 print("Full name: " + full_name)
 print("\n")
 print("Length (letters): " + str(len(full_name) - 1))
