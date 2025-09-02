@@ -1,9 +1,9 @@
+import sys
+
 # Future age
 # Script that asks for age (input) and stores it as a variable.
 # - Print how old you will be in 100 years
 # - Print what year it will be, when you turn 100. Assume current year is 2025.
-
-import sys
 
 age_input = input("Input your age: ")
 if age_input.isdigit() == False:
