@@ -31,3 +31,5 @@ pop_shove_it = 270
 total_spin = spinning_heelflip + vert_900 + pop_shove_it
 final_angle = total_spin % 360
 print("Final angle: " + str(final_angle) + "°")
+
+print("Number of spins: " + str(total_spin / 360))
