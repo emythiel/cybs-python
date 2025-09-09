@@ -36,6 +36,7 @@ second_list.remove('cyber')
 second_list.sort()
 print('Second list with cyber removed and sorted: ' + str(second_list))
 
+
 # Security Log
 # Log tool shows following ips accessed system
 # ['189.19.202.26', '124.124.86.154', '111.123.147.92', '191.194.49.89', '191.194.49.89', '3.100.186.196', '17.102.131.131',
