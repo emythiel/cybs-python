@@ -12,18 +12,18 @@ while is_pwd_valid == False:
 
     # Min length
     if len(pwd) < 12:
-        print('Password must be at least 12 characters')
+        print('Must be at least 12 characters')
         continue
 
     # 1 number
     if not any(char.isdigit() for char in pwd):
-        print('Password must contain 1 number')
+        print('Must contain 1 number')
         continue
 
     # contains dennis
     dennis_regex = re.compile(r'dennis')
     if not dennis_regex.search(pwd):
-        print('Password must contain "dennis"')
+        print('Must contain "dennis"')
         continue
 
     # current hour
@@ -31,22 +31,22 @@ while is_pwd_valid == False:
     cur_hour_pattern = rf'{cur_hour}'
     cur_hour_reg = re.compile(cur_hour_pattern)
     if not cur_hour_reg.search(pwd):
-        print('Password must contain the current hour')
+        print('Must contain the current hour')
         continue
 
     # capital letter
     if not any(char.isupper() for char in pwd):
-        print('Password must contain 1 uppercase character')
+        print('Must contain 1 uppercase character')
         continue
 
     # lowercase
     if not any(char.islower() for char in pwd):
-        print('Password must contain 1 lowercase character')
+        print('Must contain 1 lowercase character')
 
     # special character
     special_regex = re.compile(r'[\[\]@_!#$%^&*()<>?/\|}{~:]')
     if not special_regex.search(pwd):
-        print('Password must contain a special character ( @_!#$%^&*()<>?/\\|}{~: )')
+        print('Must contain a special character')
         continue
 
     # sum = 23
@@ -62,7 +62,7 @@ while is_pwd_valid == False:
     # Answer to universe
     universe_answer = re.compile(r'42')
     if not universe_answer.search(pwd):
-        print('Password must contain the answer to the universe')
+        print('Must contain the answer to the universe')
         continue
 
     # if all checks passed, you're here and done - nice
