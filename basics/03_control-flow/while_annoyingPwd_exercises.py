@@ -50,7 +50,6 @@ while is_pwd_valid == False:
         continue
 
     # sum = 23
-    temp = "0"
     sum = 0
     for char in pwd:
         if (char.isdigit()):
