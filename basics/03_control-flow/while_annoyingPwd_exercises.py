@@ -1,6 +1,6 @@
 # Annoying pwd validator
 # >:)
-import re
+import re, datetime
 
 is_pwd_valid = False
 pwd_attempts = 0
@@ -17,7 +17,7 @@ while is_pwd_valid == False:
 
     # 1 number
     if not any(char.isdigit() for char in pwd):
-        print('Password must contain at least 1 number')
+        print('Password must contain 1 number')
         continue
 
     # contains dennis
@@ -25,6 +25,23 @@ while is_pwd_valid == False:
     if not dennis_regex.search(pwd):
         print('Password must contain "dennis"')
         continue
+
+    # current hour
+    cur_hour = datetime.datetime.now().strftime('%H')
+    cur_hour_pattern = rf'{cur_hour}'
+    cur_hour_reg = re.compile(cur_hour_pattern)
+    if not cur_hour_reg.search(pwd):
+        print('Password must contain the current hour')
+        continue
+
+    # capital letter
+    if not any(char.isupper() for char in pwd):
+        print('Password must contain 1 uppercase character')
+        continue
+
+    # lowercase
+    if not any(char.islower() for char in pwd):
+        print('Password must contain 1 lowercase character')
 
     # special character
     special_regex = re.compile(r'[\[\]@_!#$%^&*()<>?/\|}{~:]')
@@ -40,6 +57,12 @@ while is_pwd_valid == False:
             sum += int(char)
     if sum != 23:
         print('The sum of all numbers must equal to 23')
+        continue
+
+    # Answer to universe
+    universe_answer = re.compile(r'42')
+    if not universe_answer.search(pwd):
+        print('Password must contain the answer to the universe')
         continue
 
     # if all checks passed, you're here and done - nice
