@@ -14,9 +14,11 @@
 
 book_prices = {}
 
-book_prices["Lord of the Rings"] = 150
-book_prices["Cybersikkerhed 101"] = 500
-book_prices["Mad Max"] = 399
+book_prices.update({
+    "Lord of the Rings": 150,
+    "Cybersikkerhed 101": 500,
+    "Mad Max": 399
+})
 
 print('Books: ' + str(book_prices))
 print('Mad Max price: ' + str(book_prices["Mad Max"]))
