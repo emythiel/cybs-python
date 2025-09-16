@@ -25,7 +25,7 @@ event_list = ['user_login', 'user_login', 'test_email', 'email_sent', 'file_acce
 
 event_count = 0
 sus_events = 0
-for e in event_list:
+for i, e in enumerate(event_list):
     # check if test event with regex
     test_regex = re.compile(r'[Tt][Ee][Ss][Tt]')
     if re.match(test_regex, e):
@@ -40,14 +40,13 @@ for e in event_list:
 
         # check if critical threat, if yes break out
         if e in ('critical_threat'):
-            print(f'CRITICAL THREAT: {e}')
+            print(f'EVENT ID: {i} - CRITICAL THREAT: {e}')
             break
 
-        print(f'ALERT: {e}')
+        print(f'EVENT ID: {i} - ALERT: {e}')
     else:
-        print(f'OK: {e}')
+        print(f'EVENT ID: {i} - OK: {e}')
 
-print(f'Event list: {list(enumerate(event_list))}')
 print(f'Total events processed: {event_count}')
 print(f'Suspicious events found: {sus_events}')
 if sus_events > 0:
