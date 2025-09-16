@@ -27,8 +27,7 @@ event_count = 0
 sus_events = 0
 for i, e in enumerate(event_list):
     # check if test event with regex
-    test_regex = re.compile(r'[Tt][Ee][Ss][Tt]')
-    if re.match(test_regex, e):
+    if re.match(r'[Tt][Ee][Ss][Tt]', e):
         print(f'TEST EVENT, SKIPPING: {e}')
         continue
 
