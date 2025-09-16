@@ -15,9 +15,9 @@
 book_prices = {}
 
 book_prices.update({
-    "Lord of the Rings": 150,
-    "Cybersikkerhed 101": 500,
-    "Mad Max": 399
+    'Lord of the Rings': 150,
+    'Cybersikkerhed 101': 500,
+    'Mad Max': 399
 })
 
 print(f'Books: {book_prices}')
@@ -28,10 +28,10 @@ print(f'Getting something nonexistant: {book_prices.get('Waluigi')}')
 book_prices["Lord of the Rings"] = 200
 print(f'New LotR price: {book_prices['Lord of the Rings']}')
 
-book_prices["Waluigi"] = 420
+book_prices['Waluigi'] = 420
 print(f'Book list with new book: {book_prices}')
 
-del(book_prices["Cybersikkerhed 101"])
+del(book_prices['Cybersikkerhed 101'])
 print(f'Book list without "Cybersikkerhed": {book_prices}')
 
 print(f'Does "Cybersikkerhed 101" exist: {'Cybersikkerhed 101' in book_prices}')

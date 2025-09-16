@@ -11,14 +11,14 @@ first_name = 'John'
 last_name = 'Doe'
 full_name = first_name + ' ' + last_name
 
-print("Full name: " + full_name)
+print(f'Full name: {full_name}')
 
-print("Length (letters): " + str(len(full_name) - 1))
+print(f'Length (letters): {len(full_name - 1)}')
 
-print("Print 50 times:\n" + ((full_name + " ") * 50))
+print(f'Print 50 times:\n{(full_name + ' ') * 50}')
 
-print("Last letter: " + full_name[-1])
-print("Is there z: " + str('z' in full_name))
+print(f'Last letter: {full_name[-1]}')
+print(f'Is there z: {'z' in full_name}')
 
 
 # String split exercise
@@ -31,13 +31,13 @@ print("Is there z: " + str('z' in full_name))
 
 full_name = 'Jane Cool Doe'
 split_full_name = full_name.split()
-print("Full name as list: " + str(split_full_name))
-print("List type: " + str(type(split_full_name)))
+print(f'Full name as list: {split_full_name}')
+print(f'List type: {type(split_full_name)}')
 
 split_on_a = full_name.split("a")
-print("Split on a: " + str(split_on_a))
+print(f'Split on a: {split_on_a}')
 
-full_name_restored = " ".join(split_full_name)
-print("Name restored: " + full_name_restored)
+full_name_restored = ' '.join(split_full_name)
+print(f'Name restored: {full_name_restored}')
 full_name_restored_a = "a".join(split_on_a)
-print("Name split on a restored: " + full_name_restored_a)
+print(f'Name split on a restored: {full_name_restored_a}')

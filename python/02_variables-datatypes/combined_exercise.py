@@ -26,7 +26,7 @@ the_dictionary = {
 }
 print(f'The dictionary: {the_dictionary}')
 
-del first_list, second_list
+del(first_list, second_list)
 
 the_dictionary['first_list'] = [e for e in the_dictionary['first_list'] if not isinstance(e, str)]
 

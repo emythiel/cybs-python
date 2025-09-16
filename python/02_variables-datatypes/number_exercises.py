@@ -5,14 +5,14 @@ import sys
 # - Print how old you will be in 100 years
 # - Print what year it will be, when you turn 100. Assume current year is 2025.
 
-age_input = input("Input your age: ")
+age_input = input('Input your age: ')
 if age_input.isdigit() == False:
-    sys.exit("That's not a number!")
+    sys.exit('That\'s not a number!')
 
 age = int(age_input)
 
-print("Age after 100 years: " + str(age + 100))
-print("Year when you turn 100: " + str(((100 - age)) + 2025))
+print(f'Age after 100 years: {age + 100}' + str(age + 100))
+print(f'Year when you turn 100: {(100 - age) + 2025}')
 
 
 # Skateboarding
@@ -30,6 +30,6 @@ pop_shove_it = 270
 
 total_spin = spinning_heelflip + vert_900 + pop_shove_it
 final_angle = total_spin % 360
-print("Final angle: " + str(final_angle) + "°")
+print(f'Final angle: {final_angle}°')
 
-print("Number of spins: " + str(total_spin / 360))
+print(f'Number of spins: {total_spin / 360}')
