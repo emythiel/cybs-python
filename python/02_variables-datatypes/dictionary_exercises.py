@@ -20,19 +20,19 @@ book_prices.update({
     "Mad Max": 399
 })
 
-print('Books: ' + str(book_prices))
-print('Mad Max price: ' + str(book_prices["Mad Max"]))
+print(f'Books: {book_prices}')
+print(f'Mad Max price: {book_prices['Mad Max']}')
 
-print('Getting something nonexistant: ' + str(book_prices.get('Waluigi')))
+print(f'Getting something nonexistant: {book_prices.get('Waluigi')}')
 
 book_prices["Lord of the Rings"] = 200
-print('New LotR price: ' + str(book_prices["Lord of the Rings"]))
+print(f'New LotR price: {book_prices['Lord of the Rings']}')
 
 book_prices["Waluigi"] = 420
-print('Book list with new book: ' + str(book_prices))
+print(f'Book list with new book: {book_prices}')
 
 del(book_prices["Cybersikkerhed 101"])
-print('Book list without "Cybersikkerhed": ' + str(book_prices))
+print(f'Book list without "Cybersikkerhed": {book_prices}')
 
-print('Does "Cybersikkerhed 101" exist: ' + str('Cybersikkerhed 101' in book_prices))
-print('Does "Mad Max" exist: ' + str('Mad Max' in book_prices))
+print(f'Does "Cybersikkerhed 101" exist: {'Cybersikkerhed 101' in book_prices}')
+print(f'Does "Mad Max" exist: {'Mad Max' in book_prices}')

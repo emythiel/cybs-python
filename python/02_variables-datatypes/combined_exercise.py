@@ -16,7 +16,7 @@ first_list = []
 
 first_list.extend([1,2,3])
 first_list.extend(['One', 'Two', 'Three'])
-print('First list with 3 numbers and 3 strings: ' + str(first_list))
+print(f'First list with 3 numbers and 3 strings: {first_list}')
 
 second_list = first_list*2
 
@@ -24,7 +24,7 @@ the_dictionary = {
     "first_list": first_list,
     "second_list": second_list
 }
-print('The dictionary: ' + str(the_dictionary))
+print(f'The dictionary: {the_dictionary}')
 
 del first_list, second_list
 
@@ -32,6 +32,6 @@ the_dictionary['first_list'] = [e for e in the_dictionary['first_list'] if not i
 
 the_dictionary['age'] = 42
 
-print('Full dictionary in current state: ' + str(the_dictionary))
-print('Age from dictionary: ' + str(the_dictionary['age']))
-print('First number from original second list in dictionary: ' + str(the_dictionary['second_list'][0]))
+print(f'Full dictionary in current state: {the_dictionary}')
+print(f'Age from dictionary: {the_dictionary['age']}')
+print(f'First number from original second list in dictionary: {the_dictionary['second_list'][0]}')
