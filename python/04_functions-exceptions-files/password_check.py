@@ -12,17 +12,15 @@
 def password_checker(pwd, min_length):
     # minimum length between 6 and 64 characters
     if not 6 <= min_length <= 64:
-        print('Minimum length does not meet requirements: Between 6 and 64')
-        return
+        return('Minimum length does not meet requirements: Between 6 and 64')
 
     # password length above minimum length
     if len(pwd) < min_length:
-        print('Password does not meet minimum length requirements')
-        return
+        return('Password does not meet minimum length requirements')
 
-    print('Password meets the requirements')
+    return('Password meets the requirements')
 
-password_checker('password', 4)  # minimum length too low
-password_checker('password', 69) # minimum length too high
-password_checker('password', 8)  # password good
-password_checker('password', 12) # password does not meet minimum length
+print(password_checker('password', 4))  # minimum length too low
+print(password_checker('password', 69)) # minimum length too high
+print(password_checker('password', 8))  # password good
+print(password_checker('password', 12)) # password does not meet minimum length
