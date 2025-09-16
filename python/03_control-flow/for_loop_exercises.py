@@ -16,7 +16,9 @@
 #   2. Use continue to skip events containing 'test'
 #   3. Add event numbering in the output( Hint: enumerate() )
 
-event_list = ['user_login', 'user_login', 'email_sent', 'file_access', 'user_login', 'failed_login', 'file_access',
+import re
+
+event_list = ['user_login', 'user_login', 'test_email', 'email_sent', 'file_access', 'user_login', 'failed_login', 'file_access',
               'failed_login', 'unauthorized_access', 'user_login', 'malware_detected', 'failed_login', 'email_sent',
               'email_sent', 'email_sent', 'email_sent', 'email_sent', 'malware_detected', 'email_sent', 'user_login',
               'file_access', 'file_access', 'user_login', 'unauthorized_access', 'email_sent', 'malware_detected']
@@ -24,13 +26,28 @@ event_list = ['user_login', 'user_login', 'email_sent', 'file_access', 'user_log
 event_count = 0
 sus_events = 0
 for e in event_list:
+    # check if test event with regex
+    test_regex = re.compile(r'[Tt][Ee][Ss][Tt]')
+    if re.match(test_regex, e):
+        print(f'TEST EVENT, SKIPPING: {e}')
+        continue
+
     event_count += 1
-    if e in ('failed_login' 'unauthorized_access' 'malware_detected'):
+
+    # check if sus event
+    if e in ('failed_login', 'unauthorized_access', 'malware_detected', 'critical_threat'):
         sus_events += 1
+
+        # check if critical threat, if yes break out
+        if e in ('critical_threat'):
+            print(f'CRITICAL THREAT: {e}')
+            break
+
         print(f'ALERT: {e}')
     else:
         print(f'OK: {e}')
 
+print(f'Event list: {list(enumerate(event_list))}')
 print(f'Total events processed: {event_count}')
 print(f'Suspicious events found: {sus_events}')
 if sus_events > 0:
