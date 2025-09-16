@@ -14,8 +14,10 @@
 
 first_list = []
 
-first_list.extend([1,2,3])
-first_list.extend(['One', 'Two', 'Three'])
+a,b,c = 1,2,3
+x,y,z = 'One','Two','Three'
+
+first_list.extend([a,b,c,x,y,z])
 print(f'First list with 3 numbers and 3 strings: {first_list}')
 
 second_list = first_list*2
