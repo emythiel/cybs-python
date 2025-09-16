@@ -21,8 +21,8 @@ print(f'First list with 3 numbers and 3 strings: {first_list}')
 second_list = first_list*2
 
 the_dictionary = {
-    "first_list": first_list,
-    "second_list": second_list
+    'first_list': first_list,
+    'second_list': second_list
 }
 print(f'The dictionary: {the_dictionary}')
 
