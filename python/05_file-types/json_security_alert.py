@@ -1,0 +1,20 @@
+# Use json_security_alert.json and:
+# Read the JSON file
+# Print: "Alert ALT-001: HIGH severity malware_detected from 192.168.1.100"
+
+import json
+
+try:
+    with open ('json_security_alert.json', 'r') as file:
+        data = json.load(file)
+except FileNotFoundError:
+    print('Alert.json not found')
+except json.JSONDecodeError:
+    print('Invalid JSON format')
+
+alert_id = data['alert_id']
+severity = data['severity']
+source_ip = data['source']
+alert_type = data['alert_type']
+
+print(f'Alert {alert_id}: {severity} severity {alert_type} from {source_ip}')
