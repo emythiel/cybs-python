@@ -1,0 +1,7 @@
+IOC,Type,Severity,Confidence,Last_Seen
+192.168.1.100,ip,high,95,2025-09-15T14:30:00Z
+malware.example.com,domain,high,88,2025-09-16T09:15:00Z
+e3b0c44298fc1c149afbf4c8996fb924,hash,high,92,2025-09-15T11:45:00Z
+10.0.0.250,ip,high,97,2025-09-16T07:45:00Z
+a1b2c3d4e5f6789012345678901234567890abcd,hash,high,89,2025-09-14T13:28:00Z
+data-exfil.dark,domain,high,94,2025-09-16T06:30:00Z

@@ -5,16 +5,16 @@
 import json
 
 try:
-    with open ('json_security_alert.json', 'r') as file:
+    with open('json_security_alert.json', 'r') as file:
         data = json.load(file)
-
-        alert_id = data['alert_id']
-        severity = data['severity']
-        source_ip = data['source_ip']
-        alert_type = data['alert_type']
-
-        print(f'Alert {alert_id}: {severity} severity {alert_type} from {source_ip}')
 except FileNotFoundError:
     print('json_security_alert.json not found')
 except json.JSONDecodeError:
     print('Invalid JSON format')
+
+alert_id = data['alert_id']
+severity = data['severity']
+source_ip = data['source_ip']
+alert_type = data['alert_type']
+
+print(f'Alert {alert_id}: {severity} severity {alert_type} from {source_ip}')
