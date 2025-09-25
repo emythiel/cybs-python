@@ -1,3 +1,6 @@
+# Mandatory 01 - Programming
+# Emily, Natasha, Sigurd & Thomas
+
 import json, csv
 from pathlib import Path
 
