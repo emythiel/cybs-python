@@ -1,0 +1,5 @@
+"alertId","machineId","firstActivity","processes"
+"ALT1000-0","machine-76","2025-08-25T08:05:11.385954+00:00","powershell.exe"
+"ALT1000-1","machine-100","2025-08-25T08:04:11.385954+00:00","powershell.exe"
+"ALT1000-2","machine-12","2025-08-25T07:56:11.385954+00:00","powershell.exe"
+"ALT1000-3","machine-34","2025-08-25T08:42:11.385954+00:00","powershell.exe"

@@ -1,0 +1,8 @@
+"alertId","machineId","firstActivity","domains"
+"ALT1000-0","machine-76","2025-08-25T08:05:11.385954+00:00","evil-download.org"
+"ALT1000-0","machine-76","2025-08-25T08:05:11.385954+00:00","suspicious-link.co"
+"ALT1000-1","machine-100","2025-08-25T08:04:11.385954+00:00","phishing-site.net"
+"ALT1000-1","machine-100","2025-08-25T08:04:11.385954+00:00","trojan-host.biz"
+"ALT1000-2","machine-12","2025-08-25T07:56:11.385954+00:00","trojan-host.biz"
+"ALT1000-2","machine-12","2025-08-25T07:56:11.385954+00:00","phishing-site.net"
+"ALT1000-3","machine-34","2025-08-25T08:42:11.385954+00:00","malicious-domain.com"
