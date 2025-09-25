@@ -47,14 +47,14 @@ Python modules required to complete the project are "**json**" and "**csv**". Yo
 ### Requirements for deliverable
 The project should be completed in groups.
 
-Handing in th eproject is a requirement to attend the exam.
+Handing in the project is a requirement to attend the exam.
 
 Handing in will be done through **itsLearning**, where you will also be able to register your groups. The deliverable will be a **.zip** file containing the following:
 
 1. Source code for the program following the specifications as described above
 2. Output of four CSV files, following the specifications as described above
-3. A presentation of about **10 minutes** to be presented as part of the project, the presentation could be about one or several of the following topics:
-    a. Showing the source code and explaining the choices you made
-    b. A short demo of your program in action
-    c. Challenges you had to solve as part of your project
-    d. Ideas on how to improve your program in the future
+3. A presentation of about **10 minutes** to be presented as part of the project, the presentation could be about one or several of the following topics:  
+    a. Showing the source code and explaining the choices you made  
+    b. A short demo of your program in action  
+    c. Challenges you had to solve as part of your project  
+    d. Ideas on how to improve your program in the future  
