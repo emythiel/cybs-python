@@ -20,7 +20,7 @@ Your task in this assignment is to create a program that can parse the JSON inci
     - CSV File 1 headers: `alertId`, `machineId`, `firstActivity`, `domains`
     - CSV File 2 headers: `alertId`, `machineId`, `firstActivity`, `fileHashes`
     - CSV File 3 headers: `alertId`, `machineId`, `firstActivity`, `ips`
-    - CSV File 4 headers: `alertId`, `machineId`, `firstActivity`, `processes`
+    - CSV File 4 headers: `alertId`, `machineId`, `firstActivity`, `processes`  
 We expect quotations ("") surrounding each header as well as value.  
 We expect headers and values separated by commans (,).
 
