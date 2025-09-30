@@ -1,4 +1,4 @@
-"alertId","machineId","firstActivity","filehashes"
+"alertId","machineId","firstActivity","fileHashes"
 "ALT1000-0","machine-76","2025-08-25T08:05:11.385954+00:00","5d41402abc4b2a76b9719d911017c592"
 "ALT1000-1","machine-100","2025-08-25T08:04:11.385954+00:00","5d41402abc4b2a76b9719d911017c592"
 "ALT1000-2","machine-12","2025-08-25T07:56:11.385954+00:00","7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730"

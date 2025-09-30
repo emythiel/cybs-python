@@ -24,7 +24,7 @@ except json.JSONDecodeError:
 
 # Create initial lists with csv headers
 csv_domains = [['alertId','machineId','firstActivity','domains']]
-csv_filehashes = [['alertId','machineId','firstActivity','filehashes']]
+csv_filehashes = [['alertId','machineId','firstActivity','fileHashes']]
 csv_ips = [['alertId','machineId','firstActivity','ips']]
 csv_processes = [['alertId','machineId','firstActivity','processes']]
 
