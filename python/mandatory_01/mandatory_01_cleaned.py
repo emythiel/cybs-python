@@ -1,5 +1,5 @@
 # Mandatory 01 - Programming
-# Emily, Natasha, Sigurd & Thomas
+# ChatGPT version
 
 import json, csv
 from pathlib import Path
