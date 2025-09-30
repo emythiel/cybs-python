@@ -5,8 +5,8 @@ import json, csv
 from pathlib import Path
 
 # Define paths
-json_path = Path.cwd().joinpath('incident.json')
-csv_dir = Path.cwd().joinpath('csv')
+json_path = Path.cwd() / 'incident.json'
+csv_dir = Path.cwd() / 'csv'
 csv_dir.mkdir(exist_ok=True) # Create csv dir if needed
 
 # Output CSV filenames
