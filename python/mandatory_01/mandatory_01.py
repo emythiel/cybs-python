@@ -34,16 +34,16 @@ for alert in data['alerts']:
         l = [alert['alertId'], alert['machineId'], alert['firstActivity'], domain]
         csv_domains.append(l)
     # Loop through filehashes and append to csv_filehashes list
-    for filehashes in alert['entities']['fileHashes']:
-        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], filehashes]
+    for filehash in alert['entities']['fileHashes']:
+        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], filehash]
         csv_filehashes.append(l)
     # Loop through IPs and append to csv_ips list
-    for ips in alert['entities']['ips']:
-        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], ips]
+    for ip in alert['entities']['ips']:
+        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], ip]
         csv_ips.append(l)
     # Loop through processes and append to csv_processes list
-    for processes in alert['entities']['processes']:
-        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], processes]
+    for process in alert['entities']['processes']:
+        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], process]
         csv_processes.append(l)
 
 # Create domain CSV
