@@ -28,22 +28,22 @@ csv_filehashes = [['alertId','machineId','firstActivity','filehashes']]
 csv_ips = [['alertId','machineId','firstActivity','ips']]
 csv_processes = [['alertId','machineId','firstActivity','processes']]
 
-for alerts in data['alerts']:
+for alert in data['alerts']:
     # Loop through domains and append to csv_domains list
-    for domains in alerts['entities']['domains']:
-        l = [alerts['alertId'], alerts['machineId'], alerts['firstActivity'], domains]
+    for domain in alert['entities']['domains']:
+        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], domain]
         csv_domains.append(l)
     # Loop through filehashes and append to csv_filehashes list
-    for filehashes in alerts['entities']['fileHashes']:
-        l = [alerts['alertId'], alerts['machineId'], alerts['firstActivity'], filehashes]
+    for filehashes in alert['entities']['fileHashes']:
+        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], filehashes]
         csv_filehashes.append(l)
     # Loop through IPs and append to csv_ips list
-    for ips in alerts['entities']['ips']:
-        l = [alerts['alertId'], alerts['machineId'], alerts['firstActivity'], ips]
+    for ips in alert['entities']['ips']:
+        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], ips]
         csv_ips.append(l)
     # Loop through processes and append to csv_processes list
-    for processes in alerts['entities']['processes']:
-        l = [alerts['alertId'], alerts['machineId'], alerts['firstActivity'], processes]
+    for processes in alert['entities']['processes']:
+        l = [alert['alertId'], alert['machineId'], alert['firstActivity'], processes]
         csv_processes.append(l)
 
 # Create domain CSV
