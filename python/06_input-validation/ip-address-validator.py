@@ -28,7 +28,7 @@ def validate_ip(ip):
     if int(octets[0]) == 10:
         raise ValueError('Private IP rejected (10.0.0.0/8 range)')
     if int(octets[0]) == 172 and 16 <= int(octets[1]) <= 31:
-        raise ValueError('Private IP rejected (172.16.0.0/16 range)')
+        raise ValueError('Private IP rejected (172.16.0.0/12 range)')
     if int(octets[0]) == 192 and int(octets[1]) == 168:
         raise ValueError('Private IP rejected (192.168.0.0/16 range)')
 
