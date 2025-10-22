@@ -45,7 +45,7 @@ structure in an SQL database. We will accept SQLite files as the output of the p
 - It is up to you to design the database structure, but we recommend following a
     similar structure with column names similar to the output of the CSV files from your
     previous assignment. These are columns we would expect to see at minimum:
-       o alertID, category, machineID, firstActivity, timestamp, detectionSource
+       o `alertID`, `category`, `machineID`, `firstActivity`, `timestamp`, `detectionSource`
 
 ### Modules
 
