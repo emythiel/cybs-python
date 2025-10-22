@@ -75,5 +75,3 @@ groups. The deliverable will be a zip file containing the following:
        b. A short demo of your program in action
        c. Challenges you had to solve as part of your project
        d. Ideas on how to improve your program in the future
-
-
