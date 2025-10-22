@@ -23,7 +23,7 @@ def db_read_all():
                     print(f'Student: {student}')
     except sqlite3.OperationalError as e:
         if 'no such table' in str(e).lower():
-            print('[ERROR]: the table "students" does not exist!')
+            print('[ERROR]: the table does not exist!')
         else:
             print(f'[ERROR] An operational error occured: {e}')
 
@@ -36,7 +36,7 @@ def db_delete_student(student):
             print(f'Student "{student}" has been deleted (if they existed)')
     except sqlite3.OperationalError as e:
         if 'no such table' in str(e).lower():
-            print('[ERROR]: the table "students" does not exist!')
+            print('[ERROR]: the table does not exist!')
         else:
             print(f'[ERROR] An operational error occured: {e}')
 
