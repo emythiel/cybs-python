@@ -202,7 +202,7 @@ def populate_db_table(db_path: str, table: str, incidents: list) -> None:
         raise ValueError(f'Unexpected error populating database table: {e}') from e
 
 
-def main():
+if __name__ == '__main__':
     # Check if database table already exists - if yes, ask to overwrite otherwise exit
     try:
         db_table_exists(DB_PATH, DB_TABLE)
@@ -243,7 +243,8 @@ def main():
 
 
     if not incident_data_final:
-        raise ValueError('Could not find anything for the "value" key?')
+        print('[ERROR] Could not find anything for the "value" key?')
+        sys.exit(1)
 
 
     # Create database / table and populate with data
@@ -251,13 +252,5 @@ def main():
         create_db_table(DB_PATH, DB_TABLE)
         populate_db_table(DB_PATH, DB_TABLE, incident_data_final)
     except ValueError as e:
-        print(f'[ERROR] {e}')
-        sys.exit(1)
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
         print(f'[ERROR] {e}')
         sys.exit(1)
