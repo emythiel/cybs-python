@@ -2,10 +2,8 @@
 # Emily, Natasha, Sigurd, Thomas
 
 # Load environment variables for api url and student email
-import sys
-import os
+import sys, os, sqlite3
 from pathlib import Path
-import sqlite3
 
 import requests
 from dotenv import load_dotenv
