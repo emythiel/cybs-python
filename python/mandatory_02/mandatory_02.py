@@ -223,18 +223,18 @@ if __name__ == '__main__':
             print(f'[INFO] Fetching data from url: {incident_url}')
             incident_data = fetch_incidents(incident_url, token)
 
-            page_data = incident_data.get('value', [])
-            if not page_data:
-                print('[ALERT] No incidents found on this page')
-                break
-
-            incident_data_final.extend(page_data)
-
             next_link = incident_data.get('@odata.nextLink')
             if next_link:
                 incident_url = f'{BASE_URL}{next_link}'
             else:
                 incident_url = None
+
+            page_data = incident_data.get('value', [])
+            if not page_data:
+                print('[ALERT] No incidents found on this page')
+                continue
+
+            incident_data_final.extend(page_data)
 
         print(f'[INFO] Retrieved {len(incident_data_final)} incidents in total.')
     except ValueError as e:
