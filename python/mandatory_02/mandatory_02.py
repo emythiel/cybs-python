@@ -22,7 +22,8 @@ DB_TABLE = 'incident_reports'
 
 # Main code
 
-def fetch_token(url: str, email) -> str:
+
+def fetch_token(url: str, email: str) -> str:
     """
     Request authentication token from API.
 
@@ -209,6 +210,7 @@ def main():
         print(f'[ERROR] {e}')
         sys.exit(1)
 
+
     # Fetch token and then incident data from API
     token_url = f'{BASE_URL}/api/auth/token'
     incident_url = f'{BASE_URL}/api/incidents'
@@ -239,8 +241,10 @@ def main():
         print(f'[ERROR] {e}')
         sys.exit(1)
 
+
     if not incident_data_final:
         raise ValueError('Could not find anything for the "value" key?')
+
 
     # Create database / table and populate with data
     try:
