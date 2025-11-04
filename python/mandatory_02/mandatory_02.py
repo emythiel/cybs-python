@@ -22,7 +22,6 @@ DB_TABLE = 'incident_reports'
 
 # Main code
 
-
 def fetch_token(url: str, email: str) -> str:
     """
     Request authentication token from API using a valid student email.
