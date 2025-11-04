@@ -222,8 +222,8 @@ def populate_db_table(db_path: str, table: str, incidents: list) -> None:
 if __name__ == '__main__':
     # Check if database table already exists - if yes, ask to overwrite otherwise exit
     try:
-        table = db_table_exists(DB_PATH, DB_TABLE)
-        if table:
+        table_exists = db_table_exists(DB_PATH, DB_TABLE)
+        if table_exists:
             db_drop_table(DB_PATH, DB_TABLE)
     except ValueError as e:
         print(f'[ERROR] {e}')
