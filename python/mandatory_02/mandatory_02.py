@@ -23,10 +23,10 @@ DB_TABLE = 'incident_reports'
 
 def fetch_token(url: str, email: str) -> str:
     """
-    Request authentication token from API.
+    Request authentication token from API using a valid student email.
 
     Args:
-        url (str): API URL.
+        url (str): API URL to request from.
         email (str): Student email needed to get a token.
 
     Returns:
@@ -55,7 +55,7 @@ def fetch_incidents(url: str, token: str) -> dict:
     Fetch incident data from the API using the provided authentication token.
 
     Args:
-        url(str): API URL.
+        url(str): API URL to request from.
         token (str): Bearer authentication token.
 
     Returns:
@@ -80,7 +80,7 @@ def fetch_incidents(url: str, token: str) -> dict:
 
 def db_table_exists(db_path: str, table: str) -> None:
     """
-    Check if a table already exists in the database.
+    Check if a table already exists in the database using provided table.
     If it does, prompt the user to overwrite or cancel.
 
     Args:
@@ -111,7 +111,7 @@ def db_table_exists(db_path: str, table: str) -> None:
 
 def create_db_table(db_path: str, table: str) -> None:
     """
-    Create a new database table if it does not already exist.
+    Create a new database table using the provided table name, if it does not already exist.
 
     Args:
         db_path (str): Path to the database file.
@@ -140,7 +140,7 @@ def create_db_table(db_path: str, table: str) -> None:
 
 def populate_db_table(db_path: str, table: str, incidents: list) -> None:
     """
-    Populate the database table with the provided data.
+    Populate the database table with the provided incidents data.
 
     Args:
         db_path (str): Path to the database file.
