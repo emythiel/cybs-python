@@ -47,8 +47,7 @@ def fetch_token(url: str, email: str) -> str:
 
         return token
     except Exception as e:
-        resp_text = getattr(response, "text", "No response text available.")  # If crash before a response text was available
-        raise ValueError(f'Unexpected error fetching API token: {e}\nResponse text: {resp_text}') from e
+        raise ValueError(f'Unexpected error fetching API token: {e}') from e
 
 
 def fetch_incidents(url: str, token: str) -> dict:
@@ -76,8 +75,7 @@ def fetch_incidents(url: str, token: str) -> dict:
 
         return incidents_data
     except Exception as e:
-        resp_text = getattr(response, "text", "No response text available.")  # If crash before a response text was available
-        raise ValueError(f'Unexpected error fetching incident data: {e}\nResponse text: {resp_text}') from e
+        raise ValueError(f'Unexpected error fetching incident data: {e}') from e
 
 
 def db_table_exists(db_path: str, table: str) -> None:
@@ -227,12 +225,7 @@ if __name__ == '__main__':
             else:
                 incident_url = None
 
-            page_data = incident_data.get('value', [])
-            if not page_data:
-                print('[ALERT] No incidents found on this page')
-                continue
-
-            incident_data_final.extend(page_data)
+            incident_data_final.extend(incident_data.get('value'), [])
 
         print(f'[INFO] Retrieved {len(incident_data_final)} incidents in total.')
     except ValueError as e:
@@ -241,7 +234,7 @@ if __name__ == '__main__':
 
 
     if not incident_data_final:
-        print('[ERROR] Could not find anything for the "value" key?')
+        print('[ERROR] No incident data was found?')
         sys.exit(1)
 
 
