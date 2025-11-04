@@ -78,7 +78,7 @@ def fetch_incidents(url: str, token: str) -> dict:
         raise ValueError(f'Unexpected error fetching incident data: {e}') from e
 
 
-def db_table_exists(db_path: str, table: str) -> None:
+def db_table_exists(db_path: str, table: str) -> bool:
     """
     Check if a table already exists in the database using provided table.
     If it does, prompt the user to overwrite or cancel.
@@ -86,6 +86,9 @@ def db_table_exists(db_path: str, table: str) -> None:
     Args:
         db_path (str): Path to the database file.
         table (str): Name of the database table.
+
+    Returns:
+        bool: True if table exists, False if not.
     """
 
     try:
@@ -95,18 +98,36 @@ def db_table_exists(db_path: str, table: str) -> None:
             table_data = cur.fetchone()
 
             if table_data:
-                choice = input(f'Table "{table}" already exists. Overwrite? (y/n): ').strip().lower()
-                if choice == 'y':
-                    cur.execute(f'DROP TABLE {table}')
-                    conn.commit()
-                    print(f'[INFO] Overwriting existing table, "{table}", and proceeding...')
-                else:
-                    print('[INFO] Operation canceled by user. Exiting with no changes.')
-                    sys.exit(0)
+                return True
             else:
                 print(f'[INFO] Table "{table}" doesn\'t exist. Proceeding as normal...')
+                return False
     except Exception as e:
-        raise ValueError(f'Unexpected error checking if table exists/dropping table: {e}') from e
+        raise ValueError(f'Unexpected error checking if table exists: {e}') from e
+
+
+def db_drop_table(db_path: str, table: str) -> None:
+    """
+    Ask to overwrite (delete) provided table, or exit.
+
+    Args:
+        db_path (str): Path to the database file.
+        table (str): Name of the database table.
+    """
+
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cur = conn.cursor()
+            choice = input(f'Table "{table}" already exists. Overwrite? (y/n): ').strip().lower()
+            if choice == 'y':
+                cur.execute(f'DROP TABLE {table}')
+                conn.commit()
+                print(f'[INFO] Overwriting existing table, "{table}", and proceeding...')
+            else:
+                print('[INFO] Operation canceled by user. Exiting with no changes.')
+                sys.exit(0)
+    except Exception as e:
+        raise ValueError(f'Unexpected error dropping table: {e}') from e
 
 
 def create_db_table(db_path: str, table: str) -> None:
@@ -201,7 +222,9 @@ def populate_db_table(db_path: str, table: str, incidents: list) -> None:
 if __name__ == '__main__':
     # Check if database table already exists - if yes, ask to overwrite otherwise exit
     try:
-        db_table_exists(DB_PATH, DB_TABLE)
+        table = db_table_exists(DB_PATH, DB_TABLE)
+        if table:
+            db_drop_table(DB_PATH, DB_TABLE)
     except ValueError as e:
         print(f'[ERROR] {e}')
         sys.exit(1)
@@ -225,7 +248,7 @@ if __name__ == '__main__':
             else:
                 incident_url = None
 
-            incident_data_final.extend(incident_data.get('value'), [])
+            incident_data_final.extend(incident_data.get('value', []))
 
         print(f'[INFO] Retrieved {len(incident_data_final)} incidents in total.')
     except ValueError as e:
