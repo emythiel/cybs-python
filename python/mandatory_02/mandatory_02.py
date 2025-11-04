@@ -2,7 +2,9 @@
 # Emily, Natasha, Sigurd, Thomas
 
 # Load environment variables for api url and student email
-import sys, os, sqlite3
+import sys
+import os
+import sqlite3
 from pathlib import Path
 
 import requests
@@ -231,12 +233,10 @@ if __name__ == '__main__':
         print(f'[ERROR] {e}')
         sys.exit(1)
 
-
     # Fetch token and then incident data from API
     token_url = f'{BASE_URL}/api/auth/token'
     incident_url = f'{BASE_URL}/api/incidents'
     incident_data_final = []
-
     try:
         token = fetch_token(token_url, STUDENT_EMAIL)
 
@@ -252,16 +252,14 @@ if __name__ == '__main__':
 
             incident_data_final.extend(incident_data.get('value', []))
 
+        if not incident_data_final:
+            print('[ERROR] No incident data was found?')
+            sys.exit(1)
+
         print(f'[INFO] Retrieved {len(incident_data_final)} incidents in total.')
     except ValueError as e:
         print(f'[ERROR] {e}')
         sys.exit(1)
-
-
-    if not incident_data_final:
-        print('[ERROR] No incident data was found?')
-        sys.exit(1)
-
 
     # Create database / table and populate with data
     try:
