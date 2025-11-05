@@ -20,18 +20,21 @@ DB_PATH = Path.cwd() / 'database.sqlite'
 DB_TABLE = 'incident_reports'
 
 
-# Main code
+# Main Code
 
 def fetch_token(url: str, email: str) -> str:
     """
-    Request authentication token from API using a valid student email.
+    Fetches a token from provided url, using the provided email to authenticate.
     Args:
-        url (str): API URL to request from.
-        email (str): Student email needed to get a token.
+        url (str): API URL to fetch token.
+        email (str): Student email to validate with.
     Returns:
-        str: The authentication token retrieved from the API.
+        str: Token retrieved from the API.
     Raises:
         ValueError: If there was a problem getting a response
+    Example:
+        >>> fetch_token('http://example.com/api', 'student@mail.dk')
+        'student-5aai5QjHit6w-YKrKI4luA'
     """
 
     headers = {'Content-Type': 'application/json'}
@@ -39,60 +42,67 @@ def fetch_token(url: str, email: str) -> str:
 
     try:
         response = requests.post(url, headers=headers, json=data, timeout=60)
-        response.raise_for_status()  # Raise HTTPError for 4xx/5xx responses
+        response.raise_for_status()
 
         token = response.json().get('token')
 
         if not token:
-            raise ValueError('Token missing from response?')
+            raise ValueError('Token missing')
 
         return token
-    except Exception as e:
-        raise ValueError(f'Unexpected error fetching API token: {e}') from e
+    except Exception as err:
+        raise ValueError(f'Unexpected error fetching API token: {err}') from err
 
 
 def fetch_incidents(url: str, token: str) -> dict:
     """
-    Fetch incident data from the API using the provided authentication token.
+    Fetches incident reports from provided url, using provided token to authenticate.
     Args:
-        url(str): API URL to request from.
-        token (str): Bearer authentication token.
+        url (str): API URL to fetch data from.
+        token (str): Token used to authenticate with.
     Returns:
-        dict: Parsed JSON resposne containing incident data.
+        dict: Parsed JSON response containing incident data.
     Raises:
         ValueError: If there was a problem getting a response
+    Example:
+        >>> fetch_incidents('http://example.com/api', 'student-5aai5QjHit6w-YKrKI4luA')
+        {incident_data_as_dict}
     """
 
     headers = {'Authorization': f'Bearer {token}'}
 
     try:
         response = requests.get(url, headers=headers, timeout=60)
-        response.raise_for_status()  # Raise HTTPError for 4xx/5xx responses
+        response.raise_for_status()
 
-        incidents_data = response.json()
+        incident_data = response.json()
 
-        if not incidents_data:
-            raise ValueError('Incident data could not be retrieved?')
+        if not incident_data:
+            raise ValueError('Incident data missing?')
 
-        return incidents_data
-    except Exception as e:
-        raise ValueError(f'Unexpected error fetching incident data: {e}') from e
+        return incident_data
+    except Exception as err:
+        raise ValueError(f'Unexpected error fetching data from API: {err}') from err
 
 
-def db_table_exists(db_path: str, table: str) -> bool:
+def db_exists(path: str, table: str) -> bool:
     """
-    Check if a table already exists in the database using provided table.
+    Checks if the provided table exists for the provided database filepath.
     Args:
-        db_path (str): Path to the database file.
+        path (str): Filepath to the database file.
         table (str): Name of the database table.
     Returns:
         bool: True if table exists, False if not.
     Raises:
-        ValueError: If there was a problem checking the database table.
+        ValueError: If there was a problem checking for the table.
+    Example:
+        >>> db_exists('./incidents/database.sqlite', 'table_name')
+        True
+        >>> db_exists('./incidents/database.sqlite', 'table_not_exist')
+        False
     """
-
     try:
-        with sqlite3.connect(db_path) as conn:
+        with sqlite3.connect(path) as conn:
             cur = conn.cursor()
             cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name=?', (table,))
             table_data = cur.fetchone()
@@ -102,47 +112,49 @@ def db_table_exists(db_path: str, table: str) -> bool:
             else:
                 print(f'[INFO] Table "{table}" doesn\'t exist. Proceeding as normal...')
                 return False
-    except Exception as e:
-        raise ValueError(f'Unexpected error checking if table exists: {e}') from e
+    except Exception as err:
+        raise ValueError(f'Unexpected error checking if table exists: {err}') from err
 
 
-def db_drop_table(db_path: str, table: str) -> None:
+def db_drop_table(path: str, table: str) -> None:
     """
-    Prompt user to overwrite (delete) provided table, or exit.
+    Drops the provided table from the provided database filepath.
     Args:
-        db_path (str): Path to the database file.
+        path (str): Filepath to the database file.
         table (str): Name of the database table.
     Raises:
-        ValueError: If there was a problem deleted the database table.
+        ValueError: If there was a problem dropping the table.
+    Example:
+        >>> db_drop_table('./incidents/database.sqlite', 'table_name')
     """
-
     try:
-        with sqlite3.connect(db_path) as conn:
-            cur = conn.cursor()
-            choice = input(f'Table "{table}" already exists. Overwrite? (y/n): ').strip().lower()
-            if choice == 'y':
+        choice = input(f'Table "{table}" already exists. Overwrite? (y/n): ').strip().lower()
+        if choice == 'y':
+            print(f'[INFO] Overwriting existing table, "{table}", and proceeding...')
+            with sqlite3.connect(path) as conn:
+                cur = conn.cursor()
                 cur.execute(f'DROP TABLE {table}')
                 conn.commit()
-                print(f'[INFO] Overwriting existing table, "{table}", and proceeding...')
-            else:
-                print('[INFO] Operation canceled by user. Exiting with no changes.')
-                sys.exit(0)
-    except Exception as e:
-        raise ValueError(f'Unexpected error dropping table: {e}') from e
+        else:
+            print('[INFO] Operation canceled by user. Exiting with no changes.')
+            sys.exit(0)
+    except Exception as err:
+        raise ValueError(f'Unexpected error dropping table: {err}') from err
 
-
-def create_db_table(db_path: str, table: str) -> None:
+def create_database(path: str, table: str) -> None:
     """
-    Create a new database table using the provided table name, if it does not already exist.
+    Creates/uses a database file at the provided path, and makes a table.
     Args:
-        db_path (str): Path to the database file.
+        path (str): Filepath to the database file.
         table (str): Name of the database table.
     Raises:
-        ValueError: If there was a problem creating the database.
+        ValueError: If there's an error creating / connecting to the database or creating the table.
+    Example:
+        >>> create_database('./incidents/database.sqlite', 'table_name')
     """
 
     try:
-        with sqlite3.connect(db_path) as conn:
+        with sqlite3.connect(path) as conn:
             cur = conn.cursor()
             query = f'''CREATE TABLE IF NOT EXISTS {table} (
                         uid INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -152,28 +164,29 @@ def create_db_table(db_path: str, table: str) -> None:
                         category TEXT,
                         machineId TEXT,
                         firstActivity TEXT,
-                        severity TEXT,
                         detectionSource TEXT
                         )'''
             cur.execute(query)
             conn.commit()
-    except Exception as e:
-        raise ValueError(f'Unexpected database error: {e}') from e
+    except Exception as err:
+        raise ValueError(f'Unexpected error creating database table: {err}') from err
 
 
-def populate_db_table(db_path: str, table: str, incidents: list) -> None:
+def populate_db(path: str, table: str, incidents: list) -> None:
     """
-    Populate the database table with the provided incidents data.
+    Populate database at the provided path, using the provided incidents list for the data.
     Args:
-        db_path (str): Path to the database file.
+        path (str): Filepath to the database file.
         table (str): Name of the database table.
-        incidents (list): List of incidents (each containing several 'alerts').
+        incidents (list): List of incidents, with each incident being a dict.
     Raises:
-        ValueError: If there was a problem populating the database table with data.
+        ValueError: If there's an error connecting to the database, or populating the table.
+    Example:
+        >>> populate_db('./incidents/database.sqlite', 'table_name', [incident1_dict, incident2_dict])
     """
 
     try:
-        with sqlite3.connect(db_path) as conn:
+        with sqlite3.connect(path) as conn:
             cur = conn.cursor()
 
             query = f'''INSERT INTO {table} (
@@ -183,53 +196,47 @@ def populate_db_table(db_path: str, table: str, incidents: list) -> None:
                         category,
                         machineId,
                         firstActivity,
-                        severity,
                         detectionSource
-                        ) VALUES (?,?,?,?,?,?,?,?)
-                        '''
+                        ) VALUES (?,?,?,?,?,?,?)'''
 
-            for incident in incidents:
-                alerts = incident.get('alerts', [])
-                if not alerts:
-                    continue  # Skip incidents with no alerts
+        for incident in incidents:
+            alerts = incident.get('alerts', [])
+            if not alerts:
+                continue
 
-                incident_id = incident.get('incidentId')
-                created_time = incident.get('createdTime')
+            incident_id = incident.get('incidentId')
+            created_time = incident.get('createdTime')
 
-                for alert in alerts:
-                    # Extract fields
-                    alert_id = alert.get("alertId")
-                    category = alert.get("category")
-                    machine_id = alert.get("machineId")
-                    first_activity = alert.get("firstActivity")
-                    severity = alert.get("severity")
-                    detection_source = alert.get("detectionSource")
+            for alert in alerts:
+                alert_id = alert.get('alertId')
+                category = alert.get('category')
+                machine_id = alert.get('machineId')
+                first_activity = alert.get('firstActivity')
+                detection_source = alert.get('detectionSource')
 
-                    # Insert into table
-                    cur.execute(query, (
-                        incident_id,
-                        created_time,
-                        alert_id,
-                        category,
-                        machine_id,
-                        first_activity,
-                        severity,
-                        detection_source
-                    ))
+                cur.execute(query, (
+                    incident_id,
+                    created_time,
+                    alert_id,
+                    category,
+                    machine_id,
+                    first_activity,
+                    detection_source
+                ))
 
-            conn.commit()
-    except Exception as e:
-        raise ValueError(f'Unexpected error populating database table: {e}') from e
+        conn.commit()
+    except Exception as err:
+        raise ValueError(f'Unexpected error populating database table: {err}') from err
 
 
 if __name__ == '__main__':
-    # Check if database table already exists - if yes, ask to overwrite otherwise exit
+    # Check if database table already exists - if yes, ask to overwrite or cancel
     try:
-        table_exists = db_table_exists(DB_PATH, DB_TABLE)
+        table_exists = db_exists(DB_PATH, DB_TABLE)
         if table_exists:
             db_drop_table(DB_PATH, DB_TABLE)
-    except ValueError as e:
-        print(f'[ERROR] {e}')
+    except ValueError as err:
+        print(f'[ERROR] {err}')
         sys.exit(1)
 
     # Fetch token and then incident data from API
@@ -256,14 +263,14 @@ if __name__ == '__main__':
             sys.exit(1)
 
         print(f'[INFO] Retrieved {len(incident_data_final)} incidents in total.')
-    except ValueError as e:
-        print(f'[ERROR] {e}')
+    except ValueError as err:
+        print(f'[ERROR] {err}')
         sys.exit(1)
 
     # Create database / table and populate with data
     try:
-        create_db_table(DB_PATH, DB_TABLE)
-        populate_db_table(DB_PATH, DB_TABLE, incident_data_final)
-    except ValueError as e:
-        print(f'[ERROR] {e}')
+        create_database(DB_PATH, DB_TABLE)
+        populate_db(DB_PATH, DB_TABLE, incident_data_final)
+    except ValueError as err:
+        print(f'[ERROR] {err}')
         sys.exit(1)
