@@ -29,8 +29,8 @@ curl -X POST http://BASE-URL-IP/api/auth/token \
 ```powershell
 $headers = @{"Content-Type"="application/json"}
 $body = @{"email"="your.email@student.edu"} | ConvertTo-Json
-$response = Invoke-RestMethod -Uri "http://BASE-URL-IP/api/auth/token" -Method
-POST -Headers $headers -Body $body
+$response = Invoke-RestMethod -Uri "http://BASE-URL-IP/api/auth/token" -Method POST -Headers $headers -Body $body
+
 Write-Host "Your token: $($response.token)"
 Write-Host "Expires in: $($response.expires_in_hours) hours"
 ```
@@ -72,8 +72,7 @@ curl -H "Authorization: Bearer student-xxxxxxxxxxxxx" \
 **PowerShell Example:**
 ```powershell
 $headers = @{"Authorization"="Bearer student-xxxxxxxxxxxxx"}
-$response = Invoke-RestMethod -Uri "http://BASE-URL-IP/api/incidents" -Headers
-$headers
+$response = Invoke-RestMethod -Uri "http://BASE-URL-IP/api/incidents" -Headers $headers
 $response
 ```
 
@@ -123,8 +122,7 @@ foreach($incident in $response.value) {
 }
 
 # Pagination - skip first 20, get next 10
-$response = Invoke-RestMethod -Uri "$baseUrl/api/incidents?`$skip=20&`$top=10" -
-Headers $headers
+$response = Invoke-RestMethod -Uri "$baseUrl/api/incidents?`$skip=20&`$top=10" -Headers $headers
 ```
 
 **Response Structure:**
@@ -179,8 +177,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 ```powershell
 $headers = @{"Authorization"="Bearer YOUR_TOKEN"}
 $incidentId = "INC1001"
-$response = Invoke-RestMethod -Uri
-"http://BASE-URL-IP/api/incidents/$incidentId" -Headers $headers
+$response = Invoke-RestMethod -Uri "http://BASE-URL-IP/api/incidents/$incidentId" -Headers $headers
 
 Write-Host "Incident: $($response.incidentName)"
 Write-Host "Severity: $($response.severity)"

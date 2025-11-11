@@ -1,125 +1,118 @@
-# Krav til Eksamensprojekt – Programmering
+# Exam Project Requirements - Programming
 
-## Projektoversigt
+## Project Overview
 
-Type: Individuelt eller gruppe (op til 4 studerende)
+Type: Individual or group (up to 4 students)
 
-Afleveringsdato: 5. december 2025
+Submission Date: 5. December, 2025
 
-Aflevering: ZIP-fil + rapport via WISEflow
+Submission: ZIP file + report via WISEflow
 
-Eksamensformat: 30 minutter:
-- 5 min præsentation
-- 20 min live-kodning og spørgsmål/svar
-- 5 min bedømmelse
-
-
-## Kontekst
-
-Sikkerhedsfirmaet SECO står fortsat over for sikkerhedsudfordringer. Med udgangspunkt i
-dit arbejde fra Obligatorisk Opgave 1 og 2 skal du nu udvikle et omfattende system til
-trusselsanalyse ved hjælp af den live hændelses-API.
-
-Vigtigt: API’en genererer nu hændelser kontinuerligt. Hvis den tilgås efter en måned, kan
-der være ca. 2000+ hændelser i systemet. Dit program skal håndtere store datamængder
-effektivt.
+Exam Format: 30 minutes:
+- 5 minutes presentation
+- 20 minutes live coding and Q&A
+- 5 minutes evaluation
 
 
-## Programkrav
+## Context
 
-1. API-integration
-    - Forbind til hændelses-API og hent autentificeringstoken
-    - Implementér korrekt token-håndtering (lagring/fornyelse)
-    - Håndter store datamængder (2000+ hændelser) effektivt via pagination
-    - Brug passende HTTP-metoder med korrekte headers
-    - Implementér retry-logik ved fejl i forespørgsler
-2. Databehandling
-    - Pars JSON-hændelsesdata til Python-objekter
-    - Udtræk og kategorisér Indicators of Compromise (IOCs)
-    - Håndter manglende eller fejlformaterede data elegant
-3. Database-lagring
-    - Design og implementér en SQLite-database
-    - Gem hændelser med korrekte relationer mellem tabeller
-    - Minimum anbefalet skema:
-        - Incidents-tabel: `incidentId`, `incidentName`, `severity`, `status`, `createdTime`
-        - Alerts-tabel: `alertId`, `incidentId`, `machineId`, `detectionSource`, `firstActivity`
-        - IOCs (entities)-tabel: `incidentId`, `type` (fx `domains`, `emails`, `fileHashes`, `ips`,
-       `processes`, osv.), `value`
-    - Implementér korrekte databaseforbindelser og transaktioner
-    - Håndter dubletter korrekt
-4. Fejlhåndtering
-    - Validér alle API-responser
-    - Håndter netværksfejl og timeouts
-    - Administrér rate limiting (50 forespørgsler/minut, 1500/time)
-    - Validér data før indsættelse i databasen
-    - Implementér korrekt exception-håndtering
-    - Implementér grundlæggende logging (skriv til fil eller brug logging-modul)
-    - Log fejl, advarsler og vigtige operationer
-5. Kodekvalitet
-    - Følg PEP8-konventioner
-    - Inkludér omfattende dokumentation:
-    - Funktion-docstrings
-    - Inline-kommentarer til kompleks logik
-    - Organisér koden i logiske funktioner
-    - Brug meningsfulde variabel- og funktionsnavne
-    - Hvis AI bruges til dokumentation, skal det markeres tydeligt
+The security company SECO continues to face security challenges.  
+Building on your work from Mandatory Task 1 and 2, you are now tasked with developing a comprehensive threat analysis system using the live event API.
+
+Important: The API now generates events continuously. If accessed after one month, there could be around 2000+ events in the system.  
+Your program must efficiently handle large datasets.
 
 
-## Tekniske krav
+## Program Requirements
 
-Påkrævede Python-moduler:
-- requests – API-kommunikation
-- json – JSON-parsing
-- sqlite3 – Databaseoperationer
-- datetime – Tidsstempel-håndtering
+1. **API Integration**
+    - Connect to the event API and retrieve authentication token
+    - Implement proper token handling (storage/renewal)
+    - Handle large datasets (2000+ events) efficiently via pagination
+    - Use appropriate HTTP methods with correct headers
+    - Implement retry logic for failed requests
+2. **Data Processing**
+    - Parse JSON event data into Python objects
+    - Extract and categorize Indicators of Compromise (IOCs)
+    - Handle missing or malformed data gracefully
+3. **Database Storage**
+    - Design and implement an SQLite database
+    - Store events with proper relationships between tables
+    - Minimum recommended schema:
+        - Incidents table: `incidentId`, `incidentName`, `severity`, `status`, `createdTime`
+        - Alerts table: `alertId`, `incidentId`, `machineId`, `detectionSource`, `firstActivity`
+        - IOCs (entities) table: `incidentId`, `type` (e.g., `domains`, `emails`, `fileHashes`, `ips`,
+       `processes`, etc.), `value`
+    - Implement proper database connections and transactions
+    - Handle duplicates correctly
+4. **Error Handling**
+    - Validate all API responses
+    - Handle network errors and timeouts
+    - Manage rate limiting (50 requests/min, 1500/hour)
+    - Validate data before inserting into the database
+    - Implement proper exception handling
+    - Implement basic logging (write to file or use logging module)
+    - Log errors, warnings, and important operations
+5. **Code Quality**
+    - Follow PEP8 conventions
+    - Include comprehensive documentation:
+        - Function docstrings
+        - Inline comments for complex logic
+        - Organize code into logical functions
+        - Use meaningful variable and function names
+        - If AI is used for documentation, it must be clearly marked
 
-Anbefalede ekstra moduler:
+
+## Technical Requirements
+
+Required Python modules:
+- requests – API communication
+- json – JSON parsing
+- sqlite3 – Database operations
+- datetime – Timestamp handling
+
+Recommended additional modules:
 - logging – Logging
-- time – Rate limiting/forsinkelser
+- time – Rate limiting/delays
 
+## Deliverables
 
-## Afleveringer
+1. **Source Code**
+    - Well-organized Python files
+    - Configuration file for API settings (no hardcoded tokens)
+    - Script for creating the database
+2. **Written Report (max. 5 pages)**
+    - Problem analysis
+    - Design decisions and justifications
+    - Challenges and solutions
+    - Future improvements
 
-1. Kildekode
-    - Velorganiserede Python-filer
-    - Konfigurationsfil til API-indstillinger (uden hardkodede tokens)
-    - Script til oprettelse af database
-2. Skriftlig rapport (maks. 5 sider)
-    - Problemanalyse
-    - Designbeslutninger og begrundelser
-    - Udfordringer og løsninger
-    - Fremtidige forbedringer
+## Presentation (5 minutes)
 
+Choose to present:
+- System architecture and design
+- Live demonstration of program functionality
+- Technical challenges and solutions
+- Data analysis and insights
+- Review of critical code sections
+- Suggestions for future improvements
 
-## Præsentation (5 minutter)
+Important: When fetching 2000 events with 100 per request:
+- Requires 20 API calls
+- Takes about 24–30 seconds (with rate limiting)
+- Plan your implementation accordingly
+- Remember: We do not want duplicates in the database
 
-Vælg at præsentere:
-- Systemarkitektur og design
-- Live-demonstration af programfunktionalitet
-- Tekniske udfordringer og løsninger
-- Dataanalyse og indsigter
-- Gennemgang af kritiske kodeafsnit
-- Forslag til fremtidige forbedringer
+## Security Considerations
+- Never hardcode API tokens in source code
+- Use environment variables or configuration files
+- Implement proper error messages without revealing sensitive information
+- Handle API credentials securely
 
-Vigtigt: Ved hentning af 2000 hændelser med 100 pr. forespørgsel:
-- Kræver 20 API-kald
-- Tager ca. 24–30 sekunder (med rate limiting)
-- Planlæg din implementering derefter
-- Husk: Vi ønsker ikke dubletter i databasen
+## Resources
 
-Sikkerhedsovervejelser
-- Hardkod aldrig API-tokens i kildekoden
-- Brug miljøvariabler eller konfigurationsfiler
-- Implementér korrekte fejlmeddelelser uden at afsløre følsomme oplysninger
-- Håndter API-legitimationsoplysninger sikkert
-
-
-## Ressourcer
-
-- API-dokumentation: [API_GUIDE.md](./API_GUIDE.md)
-- Python-dokumentation: https://docs.python.org/3/
-- SQLite-dokumentation: https://docs.python.org/3/library/sqlite3.html
-- Requests-bibliotek: https://requests.readthedocs.io/
+- API Documentation: [API_GUIDE.md](./API_GUIDE.md)
+- Python Documentation: https://docs.python.org/3/
+- SQLite Documentation: https://docs.python.org/3/library/sqlite3.html
+- Requests Library: https://requests.readthedocs.io/
 - PEP8 Style Guide: https://pep8.org/
-
-Held og lykke med dit eksamensprojekt!
