@@ -42,8 +42,6 @@ logging.basicConfig(
 def main():
     logger.info(f'--- STARTED INCIDENT DATA GATHERER ---')
 
-    incident_table_length = int()
-
     # Ensure database tables are initialized
     try:
         query_list = [
