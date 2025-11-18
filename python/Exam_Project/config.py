@@ -17,27 +17,6 @@ STUDENT_EMAIL = os.getenv('STUDENT_EMAIL')
 
 # Database
 DB_FILENAME = 'incident_reports.sqlite'
-DB_SCHEMA = {
-    'incidents': [
-        ('incidentId', 'TEXT PRIMARY KEY'),
-        ('incidentName', 'TEXT'),
-        ('severity', 'TEXT'),
-        ('status', 'TEXT'),
-        ('createdTime', 'TEXT'),
-    ],
-    'alerts': [
-        ('alertId', 'TEXT'),
-        ('incidentId', 'TEXT'),
-        ('machineId', 'TEXT'),
-        ('detectionSource', 'TEXT'),
-        ('firstActivity', 'TEXT'),
-    ],
-    'iocs': [
-        ('incidentId', 'TEXT'),
-        ('type', 'TEXT'),
-        ('value', 'TEXT'),
-    ],
-}
 
 
 # Logging

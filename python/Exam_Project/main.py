@@ -42,38 +42,37 @@ logging.basicConfig(
 def main():
     logger.info(f'--- STARTED INCIDENT DATA GATHERER ---')
 
-    # Ensure database tables are initialized
-    try:
-        query_list = [
-            db.make_create_table_query(table_name, columns)
-            for table_name, columns in conf.DB_SCHEMA.items()
-        ]
-        db.init_tables(conf.DB_FILENAME, query_list)
-        incident_table_length = db.table_length(conf.DB_FILENAME, next(iter(conf.DB_SCHEMA)))
-    except ValueError as err:
-        logger.error('Unexpected error while handling the sqlite database.', exc_info=True)
-        sys.exit(1)
-
-    # Fetch token and data from API
     token_url = f'{conf.BASE_URL}/api/auth/token'
-    incident_summary_url = f'{conf.BASE_URL}/api/incidents/summary'
     incident_url = f'{conf.BASE_URL}/api/incidents'
-    incident_data_final = list()
+
 
     try:
+        # Ensure database tables are initialized
+        db.init_tables(conf.DB_FILENAME)
+        incident_table_length = db.table_length(conf.DB_FILENAME, 'incidents')
+
+
+        # Fetch token and data from API
         token = api.fetch_token(token_url, conf.STUDENT_EMAIL)
 
-        summary_data = api.fetch_incidents(incident_summary_url, token)
-        total_incidents = summary_data.get('total_incidents')
+
+        # Fetch initial incident data and compare count with database table length
+        incident_data = api.fetch_incidents(incident_url, token, incident_table_length, 100)
+        total_incidents = incident_data.get('@odata.count')
         if total_incidents <= incident_table_length:
             logger.info(f'Current incidents in table: {incident_table_length} | Current incident total from API: {total_incidents}')
             logger.info('--- NO NEW INCIDENTS FOUND, EXITING ---')
             sys.exit(0)
 
+        # Initial population from previous incident data (no need to fetch same data twice)
+        incident_list = incident_data.get('value', [])
+        db.populate_tables(conf.DB_FILENAME, incident_list)
+
         while incident_url:
             incident_data = api.fetch_incidents(incident_url, token, incident_table_length, 100)
 
-            incident_data_final.extend(incident_data.get('value', []))
+            incident_list = incident_data.get('value', [])
+            db.populate_tables(conf.DB_FILENAME, incident_list)
 
             next_link = incident_data.get('@odata.nextLink')
             if next_link:
@@ -85,13 +84,9 @@ def main():
             logger.info('Waiting 3 seconds before next API request to avoid API limits.')
             time.sleep(3)  # Timer to prevent hitting API limits.
 
-        if not incident_data_final:
-            logger.critical('No incident data was saved, despite the fact we should be getting some?')
-            sys.exit(1)
-
-        logger.info(f'Fetched {len(incident_data_final)} new incidents in total from API.')
+        #logger.info(f'Fetched {len(incident_data_final)} new incidents in total from API.')
     except ValueError as err:
-        logger.error('Unexpected error while fetching data from API.', exc_info=True)
+        logger.error('Unexpected error: ', exc_info=True)
         sys.exit(1)
 
 

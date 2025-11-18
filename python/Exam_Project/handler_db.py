@@ -7,47 +7,6 @@ import sqlite3
 logger = logging.getLogger(__name__)
 
 
-def make_create_table_query(table_name: str, columns: list[tuple[str, str]]) -> str:
-    """
-
-    """
-    try:
-        columns_sql = ', '.join(f'{name} {column_type}' for name, column_type in columns)
-        return f'CREATE TABLE IF NOT EXISTS {table_name} ({columns_sql})'
-    except Exception as err:
-        raise ValueError(f'Something unexpected happened while trying to generate create table query: {err}') from err
-
-
-def make_insert_table_query(table_name: str, columns: list[tuple[str, str]]) -> str:
-    """
-
-    """
-    try:
-        column_names = [name for name, _ in columns]
-        placeholders = ', '.join('?' for _ in column_names)
-        column_list = ', '.join(column_names)
-        return f'INSERT OR IGNORE INTO {table_name} ({column_list}) VALUES ({placeholders})'
-    except Exception as err:
-        raise ValueError(f'Something unexpected happened while trying to generate insert or ignore query: {err}') from err
-
-
-def init_tables(path: str, queries: list[str]) -> None:
-    """
-
-    """
-    logger.info(f'Creating tables if they don\'t already exist ...')
-    try:
-        with sqlite3.connect(path) as conn:
-            cur = conn.cursor()
-            for query in queries:
-                logger.debug(f'Running query:\n{query}')
-                cur.execute(query)
-            conn.commit()
-            logger.debug(f'Queries committed to the database.')
-    except Exception as err:
-        raise ValueError(f'Error creating tables: {err}') from err
-
-
 def table_length(path: str, table: str) -> int:
     """
 
@@ -60,9 +19,101 @@ def table_length(path: str, table: str) -> int:
         raise ValueError(f'Error getting {table} table length: {err}') from err
 
 
+def init_tables(path: str) -> None:
+    """
 
-def populate_tables(path: str, queries:list[str], data: list) -> None:
+    """
+    logger.info(f'Creating tables if they don\'t already exist ...')
+    try:
+        with sqlite3.connect(path) as conn:
+            cur = conn.cursor()
+
+            query_incidents = f'''CREATE TABLE IF NOT EXISTS incidents (
+                                  incidentId TEXT PRIMARY KEY,
+                                  incidentName TEXT,
+                                  severity TEXT,
+                                  status TEXT,
+                                  createdTime TEXT
+                                  )'''
+            query_alerts    = f'''CREATE TABLE IF NOT EXISTS alerts (
+                                  alertId TEXT,
+                                  incidentId TEXT,
+                                  machineId TEXT,
+                                  detectionSource TEXT,
+                                  firstActivity TEXT
+                                  )'''
+            query_iocs      = f'''CREATE TABLE IF NOT EXISTS iocs (
+                                  incidentId TEXT,
+                                  type TEXT,
+                                  value TEXT
+                                  )'''
+            queries = [query_incidents, query_alerts, query_iocs]
+
+            for query in queries:
+                cur.execute(query)
+
+            conn.commit()
+            logger.info(f'Create table queries committed to the database.')
+    except Exception as err:
+        raise ValueError(f'Error creating tables: {err}') from err
+
+
+def populate_tables(path: str, incidents: list[dict]) -> None:
     """
 
     """
     logger.info(f'Populating tables with list of data ...')
+    try:
+        with sqlite3.connect(path) as conn:
+            cur = conn.cursor()
+
+            query_incident = f'''INSERT OR IGNORE INTO incidents (
+                                 incidentId,
+                                 incidentName,
+                                 severity,
+                                 status,
+                                 createdTime
+                                 ) VALUES (?,?,?,?,?)'''
+            query_alert    = f'''INSERT OR IGNORE INTO alerts (
+                                 alertId,
+                                 incidentId,
+                                 machineId,
+                                 detectionSource,
+                                 firstActivity
+                                 ) VALUES (?,?,?,?,?)'''
+            query_ioc      = f'''INSERT OR IGNORE INTO iocs (
+                                 incidentId,
+                                 type,
+                                 value
+                                 ) VALUES (?,?,?)'''
+
+            for inc in incidents:
+                inc_id = inc.get('incidentId')
+                inc_name = inc.get('incidentName')
+                inc_severity = inc.get('severity')
+                inc_status = inc.get('status')
+                inc_created_time = inc.get('createdTime')
+
+                cur.execute(query_incident, (inc_id, inc_name, inc_severity,
+                                             inc_status, inc_created_time))
+
+                alerts = inc.get('alerts', [])
+                for alert in alerts:
+                    alert_id = alert.get('alertId')
+                    alert_machine_id = alert.get('machineId')
+                    alert_source = alert.get('detectionSource')
+                    alert_first_activity = alert.get('firstActivity')
+
+                    cur.execute(query_alert, (alert_id, inc_id, alert_machine_id,
+                                              alert_source, alert_first_activity))
+
+                    entities = alert.get('entities', {})
+                    for key, value in entities.items():
+                        for e in value:
+                            cur.execute(query_ioc, (inc_id, key, e))
+            conn.commit()
+            logger.info(f'{len(incidents)} incidents and their data commited to the database.')
+    except Exception as err:
+        raise ValueError(f'Error populating tables: {err}') from err
+
+
