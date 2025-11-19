@@ -4,14 +4,9 @@ Main code
 
 # Import
 import argparse
-import datetime
 import logging
 import sys
-import sqlite3
 import time
-from pathlib import Path
-
-import requests
 
 import config as conf
 import handler_db as db
