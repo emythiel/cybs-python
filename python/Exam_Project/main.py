@@ -59,20 +59,28 @@ def main():
         # Fetch initial incident data and compare count with database table length
         incident_data = api.fetch_incidents(incident_url, token, incident_table_length, 100)
         total_incidents = incident_data.get('@odata.count')
+        logger.info(f'Current incidents in table: {incident_table_length} | Current incident total from API: {total_incidents}')
         if total_incidents <= incident_table_length:
-            logger.info(f'Current incidents in table: {incident_table_length} | Current incident total from API: {total_incidents}')
-            logger.info('--- NO NEW INCIDENTS FOUND, EXITING ---')
+            logger.info('--- NO NEW INCIDENTS FOUND, EXITING ---\n\n')
             sys.exit(0)
 
         # Initial population from previous incident data (no need to fetch same data twice)
         incident_list = incident_data.get('value', [])
         db.populate_tables(conf.DB_FILENAME, incident_list)
+        incident_counter = len(incident_list)
+        next_link = incident_data.get('@odata.nextLink')
+        if next_link:
+            incident_url = f'{conf.BASE_URL}{next_link}'
+        else:
+            incident_url = False
+
 
         while incident_url:
             incident_data = api.fetch_incidents(incident_url, token, incident_table_length, 100)
 
             incident_list = incident_data.get('value', [])
             db.populate_tables(conf.DB_FILENAME, incident_list)
+            incident_counter += len(incident_list)
 
             next_link = incident_data.get('@odata.nextLink')
             if next_link:
@@ -86,8 +94,11 @@ def main():
 
         #logger.info(f'Fetched {len(incident_data_final)} new incidents in total from API.')
     except ValueError as err:
-        logger.error('Unexpected error: ', exc_info=True)
+        logger.error(f'Unexpected error: {err}', exc_info=True)
         sys.exit(1)
+
+
+    logger.info(f'{incident_counter} new incidents added to the database.')
 
 
     logger.info(f'--- FINISHED INCIDENT DATA GATHERER ---\n\n')
