@@ -11,7 +11,7 @@ def table_length(path: str, table: str) -> int:
     """
 
     """
-    logger.info(f'Checking length of {table} table ...')
+    logger.debug(f'Checking length of {table} table ...')
     try:
         with sqlite3.connect(path) as conn:
             return conn.execute(f'SELECT COUNT(*) FROM {table}').fetchone()[0]
@@ -23,7 +23,7 @@ def init_tables(path: str) -> None:
     """
 
     """
-    logger.info(f'Creating tables if they don\'t already exist ...')
+    logger.debug(f'Creating tables if they don\'t already exist ...')
     try:
         with sqlite3.connect(path) as conn:
             cur = conn.cursor()
@@ -53,7 +53,7 @@ def init_tables(path: str) -> None:
                 cur.execute(query)
 
             conn.commit()
-            logger.info(f'Create table queries committed to the database.')
+            logger.debug(f'Create table queries committed to the database.')
     except Exception as err:
         raise ValueError(f'Error creating tables: {err}') from err
 
@@ -62,7 +62,7 @@ def populate_tables(path: str, incidents: list[dict]) -> None:
     """
 
     """
-    logger.info(f'Populating tables with list of data ...')
+    logger.debug(f'Populating tables with list of data ...')
     try:
         with sqlite3.connect(path) as conn:
             cur = conn.cursor()
@@ -112,7 +112,7 @@ def populate_tables(path: str, incidents: list[dict]) -> None:
                         for e in value:
                             cur.execute(query_ioc, (inc_id, key, e))
             conn.commit()
-            logger.info(f'{len(incidents)} incidents and their data commited to the database.')
+            logger.debug(f'{len(incidents)} incidents and their data commited to the database.')
     except Exception as err:
         raise ValueError(f'Error populating tables: {err}') from err
 

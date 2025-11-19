@@ -84,7 +84,7 @@ def main():
                 incident_url = False
                 break
 
-            logger.info('Waiting 3 seconds before next API request to avoid API limits.')
+            logger.debug('Waiting 3 seconds before next API request to avoid API limits.')
             time.sleep(3)  # Timer to prevent hitting API limits.
 
         #logger.info(f'Fetched {len(incident_data_final)} new incidents in total from API.')
