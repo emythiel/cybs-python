@@ -9,7 +9,12 @@ logger = logging.getLogger(__name__)
 
 def fetch_token(url: str, email: str) -> str:
     """
-
+    Fetch authentication token from URL.
+    Parameters:
+        url (str): URL to request token from.
+        email (str): Valid student email to authorize with.
+    Returns:
+        token (str): Authentication token.
     """
     headers = {'Content-Type': 'application/json'}
     data = {'email': email}
@@ -33,6 +38,14 @@ def fetch_token(url: str, email: str) -> str:
 
 def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> dict:
     """
+    Fetch incident data from URL.
+    Parameters:
+        url (str): URL to request data from.
+        token (str): Token to authenticate with.
+        skip (int): (optional) Amount of incidents to skip from API.
+        top (int): (optional) Amount of incidents to request (1-100).
+    Returns:
+        data (dict): JSON response body converted to Python object.
 
     """
     headers = {'Authorization': f'Bearer {token}'}

@@ -35,6 +35,21 @@ logging.basicConfig(
 )
 
 def main():
+    """
+    Main incident database script. The script will go through the following process:
+
+    1) Initialize database tables ('incidents', 'alerts', 'iocs') in case they don't exist.
+    2) Get row count of 'incidents' table.
+    3) Fetch authentication token from API.
+    4) Fetch incident data from API.
+    5) Get count of incident data from fetched data.
+    6) Compare row count of table and count of fetched data
+       - If counts are the same, exit (no new data), otherwise continue.
+    7) Get 'value' key from fetched data and use it to populate database.
+    8) If necessary: Use next_link from API to check if there's more data available.
+       - Repeat previous step until all data fetched and committed.
+       - Small sleep timer prevents hitting API rate limits.
+    """
     logger.info(f'--- STARTED INCIDENT DATA GATHERER ---')
 
     token_url = f'{conf.BASE_URL}/api/auth/token'
@@ -84,10 +99,11 @@ def main():
                 incident_url = False
                 break
 
-            logger.debug('Waiting 3 seconds before next API request to avoid API limits.')
-            time.sleep(3)  # Timer to prevent hitting API limits.
+            # Timer to prevent hitting API rate limits.
+            # 50/minute, 1500/hour. 60/3 = 20/minute, giving a generous buffer.
+            logger.debug('Waiting 3 seconds before next API request to avoid API rate limits.')
+            time.sleep(3)
 
-        #logger.info(f'Fetched {len(incident_data_final)} new incidents in total from API.')
     except ValueError as err:
         logger.error(f'Unexpected error: {err}', exc_info=True)
         sys.exit(1)

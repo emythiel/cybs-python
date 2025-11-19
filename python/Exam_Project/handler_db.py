@@ -9,7 +9,12 @@ logger = logging.getLogger(__name__)
 
 def table_length(path: str, table: str) -> int:
     """
-
+    Get current length of sqlite database table.
+    Parameters:
+        path (str): Path/filename of the sqlite database file.
+        table (str): Name of the table to check.
+    Returns:
+        count (int): Number of rows in the table.
     """
     logger.debug(f'Checking length of {table} table ...')
     try:
@@ -21,7 +26,9 @@ def table_length(path: str, table: str) -> int:
 
 def init_tables(path: str) -> None:
     """
-
+    Create sqlite database tables if they don't exist.
+    Parameters:
+        path (str): Path/filename of the sqlite database file.
     """
     logger.debug(f'Creating tables if they don\'t already exist ...')
     try:
@@ -60,7 +67,10 @@ def init_tables(path: str) -> None:
 
 def populate_tables(path: str, incidents: list[dict]) -> None:
     """
-
+    Populate sqlite database tables with incident data.
+    Parameters:
+        path (str): Path/filename of the sqlite database file.
+        incidents (list[dict]): List of dictionaries with incident data.
     """
     logger.debug(f'Populating tables with list of data ...')
     try:
@@ -115,5 +125,3 @@ def populate_tables(path: str, incidents: list[dict]) -> None:
             logger.debug(f'{len(incidents)} incidents and their data commited to the database.')
     except Exception as err:
         raise ValueError(f'Error populating tables: {err}') from err
-
-
