@@ -5,6 +5,9 @@ Module for handling API calls.
 import logging
 import time
 import requests
+
+import config as conf
+
 logger = logging.getLogger(__name__)
 
 MAX_RETRIES = 3
@@ -64,13 +67,25 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
 
         data = response.json()
 
-        if not data:
-            raise ValueError('Data missing from API response.')
-
         if data.get('value'):
-            logger.debug(f'Incident data retrieved from API, containing {len(data.get('value'))} incidents.')
+            logger.debug(f'Incident data retrieved from API, containing {len(data.get('value', []))} incidents.')
 
         return data
+
+    except requests.exceptions.HTTPError as err:
+        status = err.response.status_code
+
+        if status == 401:
+            logger.warning("Token expired. Refreshing token...")
+
+            new_token = fetch_token(f'{conf.BASE_URL}/api/auth/token', conf.STUDENT_EMAIL)
+
+            # retry with new token
+            headers['Authorization'] = f'Bearer {new_token}'
+            response = _request_with_retries("GET", url, headers=headers, params=params)
+            response.raise_for_status()
+
+            return response.json()
 
     except Exception as err:
         raise ValueError(f'Error fetching data from API: {err}') from err
@@ -78,7 +93,7 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
 
 def _request_with_retries(method: str, url: str, **kwargs):
     """
-
+    Helper fuction to send requests with retry logic on errors.
     """
     for attempt in range(1, MAX_RETRIES + 1):
         try:
@@ -90,6 +105,7 @@ def _request_with_retries(method: str, url: str, **kwargs):
                                f'{attempt}/{MAX_RETRIES}. Retrying...')
                 raise requests.exceptions.HTTPError(f'5xx {response.status_code}', response=response)
 
+            response.raise_for_status()
             return response
 
         except (requests.exceptions.Timeout,
@@ -107,10 +123,7 @@ def _request_with_retries(method: str, url: str, **kwargs):
             time.sleep(sleep_time)
 
         except requests.exceptions.HTTPError as err:
-            if err.response:
-                status = err.response.status_code
-            else:
-                status = '?'
+            status = err.response.status_code
 
             if 500 <= status < 600:
                 if attempt == MAX_RETRIES:
@@ -120,7 +133,7 @@ def _request_with_retries(method: str, url: str, **kwargs):
                 logger.debug(f'Sleeping {sleep_time}s before retrying...')
                 time.sleep(sleep_time)
             else:
-                raise ValueError(f'HTTP error {status}: {err.response.text}') from err
+                raise
 
         except Exception as err:
             raise ValueError(f'Unexpected error during request: {err}') from err
