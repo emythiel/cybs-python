@@ -3,8 +3,12 @@ Module for handling API calls.
 """
 
 import logging
+import time
 import requests
 logger = logging.getLogger(__name__)
+
+MAX_RETRIES = 3
+RETRY_BACKOFF = 2  # multiplier for exponential backoff
 
 
 def fetch_token(url: str, email: str) -> str:
@@ -22,7 +26,7 @@ def fetch_token(url: str, email: str) -> str:
     logger.debug(f'Fetching auth token from API at url {url} ...')
 
     try:
-        response = requests.post(url, headers=headers, json=data, timeout=30)
+        response = _request_with_retries("POST", url, headers=headers, json=data)
         response.raise_for_status()
 
         token = response.json().get('token')
@@ -55,7 +59,7 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
     logger.debug(f'Fetching incident data from API at url {url} ...')
 
     try:
-        response = requests.get(url, headers=headers, params=params, timeout=30)
+        response = _request_with_retries("GET", url, headers=headers, params=params)
         response.raise_for_status()
 
         data = response.json()
@@ -70,3 +74,53 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
 
     except Exception as err:
         raise ValueError(f'Error fetching data from API: {err}') from err
+
+
+def _request_with_retries(method: str, url: str, **kwargs):
+    """
+
+    """
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            response = requests.request(method, url, timeout=30, **kwargs)
+
+            # Retry on 5xx server errors
+            if 500 <= response.status_code < 600:
+                logger.warning(f'Server error {response.status_code} '
+                               f'{attempt}/{MAX_RETRIES}. Retrying...')
+                raise requests.exceptions.HTTPError(f'5xx {response.status_code}', response=response)
+
+            return response
+
+        except (requests.exceptions.Timeout,
+                requests.exceptions.ConnectionError) as err:
+            logger.warning(
+                f'Network error on attempt {attempt}/{MAX_RETRIES} '
+                f'for {method.upper()} {url}: {err}'
+            )
+
+            if attempt == MAX_RETRIES:
+                raise ValueError(f'Network error after {MAX_RETRIES} attempts: {err}') from err
+
+            sleep_time = RETRY_BACKOFF ** (attempt - 1)
+            logger.debug(f'Sleeping {sleep_time}s before retrying...')
+            time.sleep(sleep_time)
+
+        except requests.exceptions.HTTPError as err:
+            if err.response:
+                status = err.response.status_code
+            else:
+                status = '?'
+
+            if 500 <= status < 600:
+                if attempt == MAX_RETRIES:
+                    raise ValueError(f'Server error {status} after {MAX_RETRIES} attempts.') from err
+
+                sleep_time = RETRY_BACKOFF ** (attempt - 1)
+                logger.debug(f'Sleeping {sleep_time}s before retrying...')
+                time.sleep(sleep_time)
+            else:
+                raise ValueError(f'HTTP error {status}: {err.response.text}') from err
+
+        except Exception as err:
+            raise ValueError(f'Unexpected error during request: {err}') from err

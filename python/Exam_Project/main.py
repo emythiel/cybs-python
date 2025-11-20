@@ -105,13 +105,14 @@ def main():
             time.sleep(3)
 
     except ValueError as err:
-        logger.error(f'Unexpected error: {err}', exc_info=True)
+        logger.error(f'Fatal error: {err}\n\n', exc_info=True)
+        sys.exit(1)
+    except KeyboardInterrupt:
+        logger.warning('Interrupted by user.\n\n')
         sys.exit(1)
 
 
     logger.info(f'{incident_counter} new incidents added to the database.')
-
-
     logger.info(f'--- FINISHED INCIDENT DATA GATHERER ---\n\n')
 
 

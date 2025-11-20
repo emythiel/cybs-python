@@ -6,7 +6,6 @@ import logging
 import sqlite3
 logger = logging.getLogger(__name__)
 
-
 def table_length(path: str, table: str) -> int:
     """
     Get current length of sqlite database table.
