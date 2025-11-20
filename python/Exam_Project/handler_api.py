@@ -40,11 +40,19 @@ def fetch_token(url: str, email: str) -> str:
         logger.debug(f'Token retrieved from API: {token}')
         return token
 
+    except requests.exceptions.HTTPError as err:
+        status = err.response.status_code
+
+        if status == 403:
+            logger.warning('Invalid email used to retrieve token.')
+            raise ValueError(f'Invalid email ({email}) used to authenticate with, could not retrieve token.')
+
+
     except Exception as err:
         raise ValueError(f'Error fetching API token: {err}') from err
 
 
-def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> dict:
+def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> tuple[dict, str]:
     """
     Fetch incident data from URL.
     Parameters:
@@ -53,7 +61,7 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
         skip (int): (optional) Amount of incidents to skip from API.
         top (int): (optional) Amount of incidents to request (1-100).
     Returns:
-        data (dict): JSON response body converted to Python object.
+        tuple[dict, str]: Response data and token in case it was refreshed.
 
     """
     headers = {'Authorization': f'Bearer {token}'}
@@ -68,15 +76,15 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
         data = response.json()
 
         if data.get('value'):
-            logger.debug(f'Incident data retrieved from API, containing {len(data.get('value', []))} incidents.')
+            logger.debug(f'Incident data retrieved from API, containing {len(data.get("value", []))} incidents.')
 
-        return data
+        return data, token
 
     except requests.exceptions.HTTPError as err:
         status = err.response.status_code
 
         if status == 401:
-            logger.warning("Token expired. Refreshing token...")
+            logger.warning('Token expired. Refreshing token...')
 
             new_token = fetch_token(f'{conf.BASE_URL}/api/auth/token', conf.STUDENT_EMAIL)
 
@@ -85,7 +93,7 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
             response = _request_with_retries("GET", url, headers=headers, params=params)
             response.raise_for_status()
 
-            return response.json()
+            return response.json(), new_token  # return new token so we don't constantly refresh it
 
     except Exception as err:
         raise ValueError(f'Error fetching data from API: {err}') from err
@@ -93,26 +101,18 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
 
 def _request_with_retries(method: str, url: str, **kwargs):
     """
-    Helper fuction to send requests with retry logic on errors.
+    Helper fuction ued by `fetch_token` and `fetch_incidents`.\n
+    Handles sending requests with retry logic.
     """
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             response = requests.request(method, url, timeout=30, **kwargs)
-
-            # Retry on 5xx server errors
-            if 500 <= response.status_code < 600:
-                logger.warning(f'Server error {response.status_code} '
-                               f'{attempt}/{MAX_RETRIES}. Retrying...')
-                raise requests.exceptions.HTTPError(f'5xx {response.status_code}', response=response)
-
             response.raise_for_status()
+
             return response
 
-        except (requests.exceptions.Timeout,
-                requests.exceptions.ConnectionError) as err:
-            logger.warning(
-                f'Network error on attempt {attempt}/{MAX_RETRIES} '
-                f'for {method.upper()} {url}: {err}'
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as err:
+            logger.warning(f'Network error on attempt {attempt}/{MAX_RETRIES} for {method} {url}: {err}'
             )
 
             if attempt == MAX_RETRIES:
@@ -125,15 +125,20 @@ def _request_with_retries(method: str, url: str, **kwargs):
         except requests.exceptions.HTTPError as err:
             status = err.response.status_code
 
+            # 5xx error, retry
             if 500 <= status < 600:
                 if attempt == MAX_RETRIES:
                     raise ValueError(f'Server error {status} after {MAX_RETRIES} attempts.') from err
 
+                logger.warning(f'Server error {status} {attempt}/{MAX_RETRIES}. Retrying...')
+
                 sleep_time = RETRY_BACKOFF ** (attempt - 1)
                 logger.debug(f'Sleeping {sleep_time}s before retrying...')
                 time.sleep(sleep_time)
-            else:
+            elif status == 401 or status == 403:
                 raise
+            else:
+                raise ValueError(f'HTTP Error {status} fetching from API: {err}')
 
         except Exception as err:
             raise ValueError(f'Unexpected error during request: {err}') from err

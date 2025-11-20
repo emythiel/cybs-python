@@ -19,6 +19,9 @@ def table_length(path: str, table: str) -> int:
     try:
         with sqlite3.connect(path) as conn:
             return conn.execute(f'SELECT COUNT(*) FROM {table}').fetchone()[0]
+
+    except sqlite3.OperationalError as err:
+        raise ValueError(f'Bad SQL or missing table "{table}": {err}') from err
     except Exception as err:
         raise ValueError(f'Error getting {table} table length: {err}') from err
 
@@ -34,25 +37,25 @@ def init_tables(path: str) -> None:
         with sqlite3.connect(path) as conn:
             cur = conn.cursor()
 
-            query_incidents = f'''CREATE TABLE IF NOT EXISTS incidents (
-                                  incidentId TEXT PRIMARY KEY,
-                                  incidentName TEXT,
-                                  severity TEXT,
-                                  status TEXT,
-                                  createdTime TEXT
-                                  )'''
-            query_alerts    = f'''CREATE TABLE IF NOT EXISTS alerts (
-                                  alertId TEXT,
-                                  incidentId TEXT,
-                                  machineId TEXT,
-                                  detectionSource TEXT,
-                                  firstActivity TEXT
-                                  )'''
-            query_iocs      = f'''CREATE TABLE IF NOT EXISTS iocs (
-                                  incidentId TEXT,
-                                  type TEXT,
-                                  value TEXT
-                                  )'''
+            query_incidents = '''CREATE TABLE IF NOT EXISTS incidents (
+                                 incidentId TEXT PRIMARY KEY,
+                                 incidentName TEXT,
+                                 severity TEXT,
+                                 status TEXT,
+                                 createdTime TEXT
+                                 )'''
+            query_alerts    = '''CREATE TABLE IF NOT EXISTS alerts (
+                                 alertId TEXT,
+                                 incidentId TEXT,
+                                 machineId TEXT,
+                                 detectionSource TEXT,
+                                 firstActivity TEXT
+                                 )'''
+            query_iocs      = '''CREATE TABLE IF NOT EXISTS iocs (
+                                 incidentId TEXT,
+                                 type TEXT,
+                                 value TEXT
+                                 )'''
             queries = [query_incidents, query_alerts, query_iocs]
 
             for query in queries:
@@ -61,8 +64,10 @@ def init_tables(path: str) -> None:
             conn.commit()
             logger.debug(f'Create table queries committed to the database.')
 
-    except Exception as err:
+    except sqlite3.OperationalError as err:
         raise ValueError(f'Error creating tables: {err}') from err
+    except Exception as err:
+        raise ValueError(f'Unexpected error creating tables: {err}') from err
 
 
 def populate_tables(path: str, incidents: list[dict]) -> None:
@@ -77,52 +82,73 @@ def populate_tables(path: str, incidents: list[dict]) -> None:
         with sqlite3.connect(path) as conn:
             cur = conn.cursor()
 
-            query_incident = f'''INSERT OR IGNORE INTO incidents (
-                                 incidentId,
-                                 incidentName,
-                                 severity,
-                                 status,
-                                 createdTime
-                                 ) VALUES (?,?,?,?,?)'''
-            query_alert    = f'''INSERT OR IGNORE INTO alerts (
-                                 alertId,
-                                 incidentId,
-                                 machineId,
-                                 detectionSource,
-                                 firstActivity
-                                 ) VALUES (?,?,?,?,?)'''
-            query_ioc      = f'''INSERT OR IGNORE INTO iocs (
-                                 incidentId,
-                                 type,
-                                 value
-                                 ) VALUES (?,?,?)'''
+            query_incident = '''INSERT OR IGNORE INTO incidents (
+                                incidentId,
+                                incidentName,
+                                severity,
+                                status,
+                                createdTime
+                                ) VALUES (?,?,?,?,?)'''
+            query_alert    = '''INSERT OR IGNORE INTO alerts (
+                                alertId,
+                                incidentId,
+                                machineId,
+                                detectionSource,
+                                firstActivity
+                                ) VALUES (?,?,?,?,?)'''
+            query_ioc      = '''INSERT OR IGNORE INTO iocs (
+                                incidentId,
+                                type,
+                                value
+                                ) VALUES (?,?,?)'''
 
             for incident in incidents:
                 incident_id = incident.get('incidentId')
-                incident_name = incident.get('incidentName')
-                severity = incident.get('severity')
-                status = incident.get('status')
-                created_time = incident.get('createdTime')
 
-                cur.execute(query_incident, (incident_id, incident_name, severity,
-                                             status, created_time))
+                if incident_id is None:
+                    logger.warning('Skipping incident with missing incidentId')
+                    continue
+
+                cur.execute(query_incident, (
+                    incident_id,
+                    incident.get('incidentName'),
+                    incident.get('severity'),
+                    incident.get('status'),
+                    incident.get('createdTime')
+                ))
+
+                logger.debug(f'Inserted incident {incident_id}')
 
                 alerts = incident.get('alerts', [])
                 for alert in alerts:
                     alert_id = alert.get('alertId')
-                    machine_id = alert.get('machineId')
-                    source = alert.get('detectionSource')
-                    first_activity = alert.get('firstActivity')
 
-                    cur.execute(query_alert, (alert_id, incident_id, machine_id,
-                                              source, first_activity))
+                    if alert_id is None:
+                        logger.warning(f'Skipping alert from incident {incident_id} with missing alertId')
+                        continue
+
+                    cur.execute(query_alert, (
+                        alert_id,
+                        incident_id,
+                        alert.get('machineId'),
+                        alert.get('detectionSource'),
+                        alert.get('firstActivity')
+                    ))
+
+                    #logger.debug(f'Inserted alert {alert_id} for incident {incident_id}')
 
                     entities = alert.get('entities', {})
                     for key, value in entities.items():
                         for e in value:
                             cur.execute(query_ioc, (incident_id, key, e))
-            conn.commit()
-            logger.debug(f'{len(incidents)} incidents and their data commited to the database.')
+            logger.debug(f'Inserted incident data from incident ID {incident_id}')
 
+            conn.commit()
+            logger.debug(f'{len(incidents)} incidents and their data committed to the database.')
+
+    except sqlite3.OperationalError as err:
+        raise ValueError(f'SQLite Operational Error populating tables: {err}') from err
+    except sqlite3.DatabaseError as err:
+        raise ValueError(f'SQLite Database Error populating tables: {err}') from err
     except Exception as err:
-        raise ValueError(f'Error populating tables: {err}') from err
+        raise ValueError(f'Unexpected error populating tables: {err}') from err
