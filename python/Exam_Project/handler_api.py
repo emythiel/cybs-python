@@ -32,6 +32,7 @@ def fetch_token(url: str, email: str) -> str:
 
         logger.debug(f'Token retrieved from API: {token}')
         return token
+
     except Exception as err:
         raise ValueError(f'Error fetching API token: {err}') from err
 
@@ -66,5 +67,6 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
             logger.debug(f'Incident data retrieved from API, containing {len(data.get('value'))} incidents.')
 
         return data
+
     except Exception as err:
         raise ValueError(f'Error fetching data from API: {err}') from err

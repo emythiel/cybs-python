@@ -61,6 +61,7 @@ def init_tables(path: str) -> None:
 
             conn.commit()
             logger.debug(f'Create table queries committed to the database.')
+
     except Exception as err:
         raise ValueError(f'Error creating tables: {err}') from err
 
@@ -97,31 +98,32 @@ def populate_tables(path: str, incidents: list[dict]) -> None:
                                  value
                                  ) VALUES (?,?,?)'''
 
-            for inc in incidents:
-                inc_id = inc.get('incidentId')
-                inc_name = inc.get('incidentName')
-                inc_severity = inc.get('severity')
-                inc_status = inc.get('status')
-                inc_created_time = inc.get('createdTime')
+            for incident in incidents:
+                incident_id = incident.get('incidentId')
+                incident_name = incident.get('incidentName')
+                severity = incident.get('severity')
+                status = incident.get('status')
+                created_time = incident.get('createdTime')
 
-                cur.execute(query_incident, (inc_id, inc_name, inc_severity,
-                                             inc_status, inc_created_time))
+                cur.execute(query_incident, (incident_id, incident_name, severity,
+                                             status, created_time))
 
-                alerts = inc.get('alerts', [])
+                alerts = incident.get('alerts', [])
                 for alert in alerts:
                     alert_id = alert.get('alertId')
-                    alert_machine_id = alert.get('machineId')
-                    alert_source = alert.get('detectionSource')
-                    alert_first_activity = alert.get('firstActivity')
+                    machine_id = alert.get('machineId')
+                    source = alert.get('detectionSource')
+                    first_activity = alert.get('firstActivity')
 
-                    cur.execute(query_alert, (alert_id, inc_id, alert_machine_id,
-                                              alert_source, alert_first_activity))
+                    cur.execute(query_alert, (alert_id, incident_id, machine_id,
+                                              source, first_activity))
 
                     entities = alert.get('entities', {})
                     for key, value in entities.items():
                         for e in value:
-                            cur.execute(query_ioc, (inc_id, key, e))
+                            cur.execute(query_ioc, (incident_id, key, e))
             conn.commit()
             logger.debug(f'{len(incidents)} incidents and their data commited to the database.')
+
     except Exception as err:
         raise ValueError(f'Error populating tables: {err}') from err

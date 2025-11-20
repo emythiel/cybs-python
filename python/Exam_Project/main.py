@@ -86,7 +86,7 @@ def main():
 
 
         while incident_url:
-            incident_data = api.fetch_incidents(incident_url, token, incident_table_length, 100)
+            incident_data = api.fetch_incidents(incident_url, token)
 
             incident_list = incident_data.get('value', [])
             db.populate_tables(conf.DB_FILENAME, incident_list)
