@@ -54,7 +54,6 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
         top (int): (optional) Amount of incidents to request (1-100).
     Returns:
         tuple[dict, str]: Response data and token in case it was refreshed.
-
     """
     headers = {'Authorization': f'Bearer {token}'}
     params = {'$skip': skip, '$top': top}
