@@ -40,14 +40,6 @@ def fetch_token(url: str, email: str) -> str:
         logger.debug(f'Token retrieved from API: {token}')
         return token
 
-    except requests.exceptions.HTTPError as err:
-        status = err.response.status_code
-
-        if status == 403:
-            logger.warning('Invalid email used to retrieve token.')
-            raise ValueError(f'Invalid email ({email}) used to authenticate with, could not retrieve token.')
-
-
     except Exception as err:
         raise ValueError(f'Error fetching API token: {err}') from err
 
@@ -112,8 +104,7 @@ def _request_with_retries(method: str, url: str, **kwargs):
             return response
 
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as err:
-            logger.warning(f'Network error on attempt {attempt}/{MAX_RETRIES} for {method} {url}: {err}'
-            )
+            logger.warning(f'Network error on attempt {attempt}/{MAX_RETRIES} for {method} {url}: {err}')
 
             if attempt == MAX_RETRIES:
                 raise ValueError(f'Network error after {MAX_RETRIES} attempts: {err}') from err
@@ -135,7 +126,7 @@ def _request_with_retries(method: str, url: str, **kwargs):
                 sleep_time = RETRY_BACKOFF ** (attempt - 1)
                 logger.debug(f'Sleeping {sleep_time}s before retrying...')
                 time.sleep(sleep_time)
-            elif status == 401 or status == 403:
+            elif status == 401:
                 raise
             else:
                 raise ValueError(f'HTTP Error {status} fetching from API: {err}')
