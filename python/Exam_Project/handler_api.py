@@ -109,7 +109,7 @@ def _request_with_retries(method: str, url: str, **kwargs):
             if attempt == MAX_RETRIES:
                 raise ValueError(f'Network error after {MAX_RETRIES} attempts: {err}') from err
 
-            sleep_time = RETRY_BACKOFF ** (attempt - 1)
+            sleep_time = RETRY_BACKOFF ** (attempt - 1)  # exponential sleep timer
             logger.debug(f'Sleeping {sleep_time}s before retrying...')
             time.sleep(sleep_time)
 
@@ -123,11 +123,11 @@ def _request_with_retries(method: str, url: str, **kwargs):
 
                 logger.warning(f'Server error {status} {attempt}/{MAX_RETRIES}. Retrying...')
 
-                sleep_time = RETRY_BACKOFF ** (attempt - 1)
+                sleep_time = RETRY_BACKOFF ** (attempt - 1)  # exponential sleep timer
                 logger.debug(f'Sleeping {sleep_time}s before retrying...')
                 time.sleep(sleep_time)
             elif status == 401:
-                raise
+                raise  # raise to the calling function
             else:
                 raise ValueError(f'HTTP Error {status} fetching from API: {err}')
 
