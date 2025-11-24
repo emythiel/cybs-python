@@ -4,6 +4,7 @@ Module for handling API calls.
 
 import logging
 import time
+
 import requests
 
 import config as conf
