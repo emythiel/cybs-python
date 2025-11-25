@@ -63,7 +63,7 @@ def main():
         incident_table_length = db.table_length(conf.DB_FILENAME, 'incidents')
 
 
-        # Fetch token and data from API
+        # Fetch token from API
         token = api.fetch_token(token_url, conf.STUDENT_EMAIL)
 
 
