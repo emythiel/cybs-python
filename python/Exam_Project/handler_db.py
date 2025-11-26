@@ -45,16 +45,18 @@ def init_tables(path: str) -> None:
                                  createdTime TEXT
                                  )'''
             query_alerts    = '''CREATE TABLE IF NOT EXISTS alerts (
-                                 alertId TEXT,
+                                 alertId TEXT PRIMARY KEY,
                                  incidentId TEXT,
                                  machineId TEXT,
                                  detectionSource TEXT,
-                                 firstActivity TEXT
+                                 firstActivity TEXT,
+                                 FOREIGN KEY(incidentId) REFERENCES incidents(incidentId)
                                  )'''
             query_iocs      = '''CREATE TABLE IF NOT EXISTS iocs (
                                  incidentId TEXT,
                                  type TEXT,
-                                 value TEXT
+                                 value TEXT,
+                                 FOREIGN KEY(incidentId) REFERENCES incidents(incidentId)
                                  )'''
             queries = [query_incidents, query_alerts, query_iocs]
 
