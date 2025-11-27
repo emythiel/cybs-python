@@ -6,13 +6,23 @@ import logging
 import time
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
 
 import config as conf
 
 logger = logging.getLogger(__name__)
 
-MAX_RETRIES = 3
-RETRY_BACKOFF = 2  # multiplier for exponential backoff
+# Setup retry logic
+retry_strategy = Retry(
+    total = 3,
+    status_forcelist=[429,500,502,503,504],
+    allowed_methods=["GET","POST"],
+    backoff_factor=2
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http = requests.Session()
+http.mount("http://", adapter)
 
 
 def fetch_token(url: str, email: str) -> str:
@@ -30,7 +40,7 @@ def fetch_token(url: str, email: str) -> str:
     logger.debug(f'Fetching auth token from API at url {url} ...')
 
     try:
-        response = _request_with_retries("POST", url, headers=headers, json=data)
+        response = http.post(url, headers=headers, json=data)
         response.raise_for_status()
 
         token = response.json().get('token')
@@ -62,7 +72,7 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
     logger.debug(f'Fetching incident data from API at url {url} ...')
 
     try:
-        response = _request_with_retries("GET", url, headers=headers, params=params)
+        response = http.get(url, headers=headers, params=params)
         response.raise_for_status()
 
         data = response.json()
@@ -89,47 +99,3 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
 
     except Exception as err:
         raise ValueError(f'Error fetching data from API: {err}') from err
-
-
-def _request_with_retries(method: str, url: str, **kwargs):
-    """
-    Helper fuction ued by `fetch_token` and `fetch_incidents`.\n
-    Handles sending requests with retry logic.
-    """
-    for attempt in range(1, MAX_RETRIES + 1):
-        try:
-            response = requests.request(method, url, timeout=30, **kwargs)
-            response.raise_for_status()
-
-            return response
-
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as err:
-            logger.warning(f'Network error on attempt {attempt}/{MAX_RETRIES} for {method} {url}: {err}')
-
-            if attempt == MAX_RETRIES:
-                raise ValueError(f'Network error after {MAX_RETRIES} attempts: {err}') from err
-
-            sleep_time = RETRY_BACKOFF ** (attempt - 1)  # exponential sleep timer
-            logger.debug(f'Sleeping {sleep_time}s before retrying...')
-            time.sleep(sleep_time)
-
-        except requests.exceptions.HTTPError as err:
-            status = err.response.status_code
-
-            # 5xx error, retry
-            if 500 <= status < 600:
-                if attempt == MAX_RETRIES:
-                    raise ValueError(f'Server error {status} after {MAX_RETRIES} attempts.') from err
-
-                logger.warning(f'Server error {status} {attempt}/{MAX_RETRIES}. Retrying...')
-
-                sleep_time = RETRY_BACKOFF ** (attempt - 1)  # exponential sleep timer
-                logger.debug(f'Sleeping {sleep_time}s before retrying...')
-                time.sleep(sleep_time)
-            elif status == 401:
-                raise  # raise to the calling function
-            else:
-                raise ValueError(f'HTTP Error {status} fetching from API: {err}')
-
-        except Exception as err:
-            raise ValueError(f'Unexpected error during request: {err}') from err
