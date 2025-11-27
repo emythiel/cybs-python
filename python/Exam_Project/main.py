@@ -50,7 +50,6 @@ def main():
        - Repeat previous step until all data fetched and committed.
        - Small sleep timer prevents hitting API rate limits.
     """
-    logger.info('---------------------------------------\n\n')
     logger.info(f'--- STARTED INCIDENT DATA GATHERER ---')
 
     token_url = f'{conf.BASE_URL}/api/auth/token'
@@ -87,6 +86,11 @@ def main():
 
 
         while incident_url:
+            # Timer to prevent hitting API rate limits.
+            # 50/minute, 1500/hour. 60/3 = 20/minute, giving a generous buffer.
+            logger.debug('Waiting 3 seconds before next API request to avoid API rate limits.')
+            time.sleep(3)
+
             incident_data, token = api.fetch_incidents(incident_url, token)
 
             incident_list = incident_data.get('value', [])
@@ -100,10 +104,7 @@ def main():
                 incident_url = False
                 break
 
-            # Timer to prevent hitting API rate limits.
-            # 50/minute, 1500/hour. 60/3 = 20/minute, giving a generous buffer.
-            logger.debug('Waiting 3 seconds before next API request to avoid API rate limits.')
-            time.sleep(3)
+        logger.info(f'{incident_counter} new incidents added to the database.')
 
     except ValueError as err:
         logger.error(f'Fatal error: {err}', exc_info=True)
@@ -112,9 +113,9 @@ def main():
         logger.warning('Interrupted by user.')
         sys.exit(1)
 
-
-    logger.info(f'{incident_counter} new incidents added to the database.')
-    logger.info(f'--- FINISHED INCIDENT DATA GATHERER ---')
+    finally:
+        api.http.close()
+        logger.info(f'--- FINISHED INCIDENT DATA GATHERER ---\n\n')
 
 
 if __name__ == '__main__':
