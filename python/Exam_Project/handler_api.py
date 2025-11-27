@@ -92,7 +92,7 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
 
             # retry with new token
             headers['Authorization'] = f'Bearer {new_token}'
-            response = _request_with_retries("GET", url, headers=headers, params=params)
+            response = http.get(url, headers=headers, params=params)
             response.raise_for_status()
 
             return response.json(), new_token  # return new token so we don't constantly refresh it
