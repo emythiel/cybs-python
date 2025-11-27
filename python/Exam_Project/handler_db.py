@@ -56,7 +56,8 @@ def init_tables(path: str) -> None:
                                  incidentId TEXT,
                                  type TEXT,
                                  value TEXT,
-                                 FOREIGN KEY(incidentId) REFERENCES incidents(incidentId)
+                                 FOREIGN KEY(incidentId) REFERENCES incidents(incidentId),
+                                 CONSTRAINT ioc UNIQUE(incidentId,type,value)
                                  )'''
             queries = [query_incidents, query_alerts, query_iocs]
 
