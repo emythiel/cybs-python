@@ -22,7 +22,7 @@ retry_strategy = Retry(
 )
 adapter = HTTPAdapter(max_retries=retry_strategy)
 http = requests.Session()
-http.mount("http://", adapter)
+http.mount("http://", adapter)  # HTTPS not used by API, not needed
 
 
 def fetch_token(url: str, email: str) -> str:
@@ -40,7 +40,7 @@ def fetch_token(url: str, email: str) -> str:
     logger.debug(f'Fetching auth token from API at url {url} ...')
 
     try:
-        response = http.post(url, headers=headers, json=data)
+        response = http.post(url, headers=headers, json=data, timeout=30)
         response.raise_for_status()
 
         token = response.json().get('token')
@@ -72,7 +72,7 @@ def fetch_incidents(url: str, token: str, skip: int = None, top: int = None) -> 
     logger.debug(f'Fetching incident data from API at url {url} ...')
 
     try:
-        response = http.get(url, headers=headers, params=params)
+        response = http.get(url, headers=headers, params=params, timeout=30)
         response.raise_for_status()
 
         data = response.json()
