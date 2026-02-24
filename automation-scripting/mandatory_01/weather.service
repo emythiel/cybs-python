@@ -1,0 +1,11 @@
+[Unit]
+Description=Python Weather Script
+
+[Service]
+User=kali
+WorkingDirectory=/home/kali/automation-scripting/mandatory01
+ExecStart=/home/kali/automation-scripting/mandatory01/.venv/bin/python /home/kali/automation-scripting/mandatory01/weather.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
