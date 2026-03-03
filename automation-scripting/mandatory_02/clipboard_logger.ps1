@@ -15,11 +15,11 @@ if (!(Test-Path $logFile)) {
 $currentClipboard = Get-Clipboard
 
 # Get the last line of the logfile, split at first | to ignore timestamp
-$fileClipboard = ((Get-Content $logFile -Tail 1) -split '\|.',2)[1]
+$fileClipboard = ((Get-Content $logFile -Tail 1) -split '\s\|\s',2)[1]
 
 # Compare clipboard content with latest logfile entry
 if ($currentClipboard -ne $fileClipboard) {
     # Log the change
-    $timestamp = Get-Date
+    $timestamp = Get-Date -Format "yyyy/MM/dd HH:mm:ss"
     Add-Content -Path $logFile -Value "$timestamp | $currentClipboard"
 }
