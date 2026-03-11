@@ -25,7 +25,7 @@ while ($true) {
 
         # Get last line of clipboard (if it's there)
         $lastLine = Get-Content $logFile -Tail 1 -ErrorAction SilentlyContinue
-        # Split at '|' so we ignore  the initial timestamp
+        # Split at first '>' so we ignore  the initial timestamp
         $fileClipboard = if ($lastLine) { ($lastLine -split '\>',2)[1] } else { "" }
 
         # Compare clipboard content with latest logfile entry
