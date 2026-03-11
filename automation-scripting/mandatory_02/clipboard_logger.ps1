@@ -16,18 +16,20 @@ while ($true) {
     }
 
     # Get current clipboard content
-    $currentClipboard = Get-Clipboard
+    # Each new line is it's own element in an array, so we join them with a space
+    # This helps with problems with new lines
+    $currentClipboard = ((Get-Clipboard) -Join ' ')
 
     # Get last line of clipboard (if it's there)
     $lastLine = Get-Content $logFile -Tail 1 -ErrorAction SilentlyContinue
     # Split at '|' so we ignore  the initial timestamp
-    $fileClipboard = if ($lastLine) { ($lastLine -split '\s\|\s',2)[1] } else { "" }
+    $fileClipboard = if ($lastLine) { ($lastLine -split '\>',2)[1] } else { "" }
 
     # Compare clipboard content with latest logfile entry
     if ($currentClipboard -ne $fileClipboard) {
         # Log the change
-        $timestamp = Get-Date -Format "yyyy/MM/dd HH:mm:ss"
-        Add-Content -Path $logFile -Value "$timestamp | $currentClipboard"
+        $timestamp = Get-Date -Format "yyyy/MM/dd-HH:mm:ss"
+        Add-Content -Path $logFile -Value "$timestamp>$currentClipboard"
     }
 
     # Wait 5 seconds before checking again
